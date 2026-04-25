@@ -8,12 +8,11 @@
         @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto+Condensed:wght@400;700&display=swap');
 
         :root {
-            --br-black: #111111;
-            --br-grey: #222222;
+            --br-black: #0a0a0a;
+            --br-grey: #1a1a1a;
             --br-light-grey: #333333;
             --br-white: #ffffff;
             --br-rainbow: linear-gradient(90deg, #FFB7B2, #FFDAC1, #E2F0CB, #B5EAD7, #C7CEEA, #FFB7B2, #FFDAC1);
-            --br-pastel-blue: #C7CEEA;
         }
 
         body {
@@ -26,31 +25,39 @@
             align-items: center;
             min-height: 100vh;
             text-transform: uppercase;
+            overflow-x: hidden;
         }
 
         .container {
             width: 100%;
-            max-width: 500px;
+            max-width: 480px;
             background-color: var(--br-grey);
             position: relative;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
             overflow: hidden;
+            border: 1px solid #222;
         }
 
+        /* Active RGB Shimmer Border */
         .container::before {
             content: "";
             position: absolute;
             top: 0; left: 0; right: 0;
             height: 6px;
             background: var(--br-rainbow);
-            background-size: 300% 300%;
-            animation: shimmer 4s linear infinite;
+            background-size: 300% auto;
+            animation: shimmer 3s linear infinite;
             z-index: 10;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 300% 50%; }
         }
 
         .header {
             background-color: var(--br-black);
-            padding: 20px 15px 15px 15px;
+            padding: 20px 15px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -60,75 +67,64 @@
         .br-logo {
             font-family: 'Oswald', sans-serif;
             font-weight: 700;
-            font-size: 20px;
+            font-size: 18px;
             letter-spacing: -0.5px;
             background: var(--br-rainbow);
-            background-size: 300% 300%;
-            animation: shimmer 4s linear infinite;
+            background-size: 300% auto;
+            animation: shimmer 3s linear infinite;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .live-tag {
-            color: var(--br-white);
-            font-size: 12px;
+            color: #fff;
+            font-size: 11px;
             font-weight: bold;
+            letter-spacing: 1px;
+            background: rgba(255,255,255,0.05);
+            padding: 4px 10px;
+            border-radius: 4px;
             display: flex;
             align-items: center;
-            background-color: rgba(255, 255, 255, 0.05);
-            padding: 4px 8px;
-            border-radius: 4px;
         }
 
         .live-tag::before {
             content: "";
-            display: inline-block;
-            width: 6px;
-            height: 6px;
+            width: 8px; height: 8px;
             background: var(--br-rainbow);
-            background-size: 300% 300%;
+            background-size: 300% auto;
+            animation: shimmer 3s linear infinite, pulse 1.5s infinite;
             border-radius: 50%;
-            margin-right: 6px;
-            animation: pulse 1.5s infinite, shimmer 4s linear infinite;
+            margin-right: 8px;
         }
 
-        @keyframes shimmer {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 100% 50%; }
-        }
-
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.3; }
-            100% { opacity: 1; }
-        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
 
         .main-pick {
             padding: 40px 20px;
             text-align: center;
-            background: linear-gradient(180deg, var(--br-grey) 0%, var(--br-black) 100%);
+            background: radial-gradient(circle at center, #222 0%, #0a0a0a 100%);
         }
 
         .label {
             font-family: 'Oswald', sans-serif;
             font-size: 18px;
-            letter-spacing: 2px;
-            margin-bottom: 5px;
+            letter-spacing: 3px;
             background: var(--br-rainbow);
-            background-size: 300% 300%;
-            animation: shimmer 4s linear infinite;
+            background-size: 300% auto;
+            animation: shimmer 3s linear infinite;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
         }
 
         .pick-number {
             font-family: 'Oswald', sans-serif;
-            font-size: 110px;
+            font-size: 120px;
             line-height: 1;
             font-weight: 700;
             margin: 0;
-            color: var(--br-white);
-            text-shadow: 4px 4px 0px rgba(0,0,0,0.5);
+            text-shadow: 0 10px 20px rgba(0,0,0,0.5);
         }
 
         .stats-bar {
@@ -136,82 +132,93 @@
             grid-template-columns: 1fr 1fr 1fr;
             background-color: var(--br-black);
             padding: 20px 0;
-            border-top: 1px solid var(--br-light-grey);
-            border-bottom: 1px solid var(--br-light-grey);
+            border-top: 1px solid #222;
+            border-bottom: 1px solid #222;
         }
 
-        .stat-item { text-align: center; border-right: 1px solid var(--br-light-grey); }
+        .stat-item { text-align: center; border-right: 1px solid #222; }
         .stat-item:last-child { border-right: none; }
 
         .stat-value {
             font-family: 'Oswald', sans-serif;
-            font-size: 24px;
+            font-size: 22px;
             background: var(--br-rainbow);
-            background-size: 300% 300%;
-            animation: shimmer 4s linear infinite;
+            background-size: 300% auto;
+            animation: shimmer 3s linear infinite;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
-        .stat-label { font-size: 10px; color: #888; letter-spacing: 1px; margin-top: 4px; }
+        .stat-label { font-size: 9px; color: #666; letter-spacing: 1px; margin-top: 4px; }
 
-        .controls { padding: 25px; background-color: var(--br-grey); }
-
-        button {
-            width: 100%;
-            padding: 18px;
-            font-family: 'Oswald', sans-serif;
-            font-size: 22px;
-            font-weight: 700;
-            cursor: pointer;
-            text-transform: uppercase;
-            border: none;
-            transition: all 0.2s;
-        }
+        .controls { padding: 30px; background-color: var(--br-grey); }
 
         .btn-next {
             background: var(--br-rainbow);
-            background-size: 300% 300%;
-            animation: shimmer 4s linear infinite;
-            color: var(--br-black);
+            background-size: 300% auto;
+            animation: shimmer 3s linear infinite;
+            color: #000;
+            font-family: 'Oswald', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            border-radius: 4px;
+            padding: 18px;
             margin-bottom: 15px;
+            cursor: pointer;
+            border: none;
+            width: 100%;
         }
 
-        .btn-reset { background-color: transparent; color: #666; font-size: 14px; padding: 10px; border: 1px solid #444; }
+        .btn-next:hover { filter: brightness(1.2); transform: translateY(-2px); }
+        .btn-next:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .btn-reset { background: transparent; color: #444; border: 1px solid #222; font-size: 12px; padding: 10px; cursor: pointer; width: 100%; border-radius: 4px; }
 
         .nap-tracker {
-            padding: 15px 25px;
-            background-color: var(--br-black);
-            border-top: 1px solid var(--br-light-grey);
+            background: #000;
+            padding: 20px 25px;
+            border-top: 1px solid #222;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .nap-time { font-family: 'Oswald', sans-serif; font-size: 24px; color: var(--br-pastel-blue); }
+        .nap-time { font-family: 'Oswald', sans-serif; font-size: 28px; color: #C7CEEA; }
 
         .nap-controls { display: flex; gap: 10px; }
         .nap-controls button {
-            width: 40px; height: 40px; font-size: 16px;
-            background-color: var(--br-grey); color: var(--br-white);
-            border: 1px solid #444; border-radius: 6px;
-            display: flex; align-items: center; justify-content: center;
+            width: 44px; height: 44px; font-size: 18px;
+            background: #1a1a1a; color: #fff;
+            border: 1px solid #333; border-radius: 8px;
+            cursor: pointer;
         }
 
         .nap-controls button.active {
-            background: var(--br-rainbow); background-size: 300% 300%;
-            animation: shimmer 4s linear infinite; color: var(--br-black); border: none;
+            background: var(--br-rainbow);
+            background-size: 300% auto;
+            animation: shimmer 3s linear infinite;
+            color: #000; border: none;
         }
 
-        .history { padding: 15px; max-height: 120px; overflow-y: auto; background-color: var(--br-black); font-size: 13px; border-top: 1px solid var(--br-light-grey); }
-        .history-title { color: #555; font-weight: bold; margin-bottom: 8px; font-size: 11px; }
-        .history-item { padding: 4px 0; border-bottom: 1px solid #222; display: flex; justify-content: space-between; }
-        .history-item span:first-child { color: #888; }
+        .history { padding: 15px; max-height: 100px; overflow-y: auto; background: #050505; font-size: 12px; color: #444; border-top: 1px solid #222; }
+        .history-item { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #111; }
+
+        #errorOverlay {
+            display: none;
+            background: #ff4444; color: #fff;
+            padding: 10px; text-align: center; font-size: 12px;
+            text-transform: none;
+        }
+        #errorOverlay a { color: #fff; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="container">
+        <div id="errorOverlay">
+            <b>Database Offline:</b> Please <a id="fixLink" href="#" target="_blank">Enable Firestore</a> to sync with your team.
+        </div>
+
         <div class="header">
             <div class="br-logo">B/R NFL DRAFT SHOW</div>
             <div class="live-tag">LIVE</div>
@@ -219,41 +226,42 @@
 
         <div class="main-pick">
             <div class="label" id="statusLabel">On The Clock</div>
-            <h1 class="pick-number" id="currentPickDisplay">185</h1>
+            <h1 class="pick-number" id="pickDisplay">185</h1>
         </div>
 
         <div class="stats-bar">
-            <div class="stat-item"><div class="stat-value" id="remainingCount">72</div><div class="stat-label">Picks Left</div></div>
-            <div class="stat-item"><div class="stat-value" id="timeRemaining">00:00:00</div><div class="stat-label">Est. Time</div></div>
+            <div class="stat-item"><div class="stat-value" id="countDisplay">72</div><div class="stat-label">Picks Left</div></div>
+            <div class="stat-item"><div class="stat-value" id="timerDisplay">00:00:00</div><div class="stat-label">Est. Time</div></div>
             <div class="stat-item"><div class="stat-value">257</div><div class="stat-label">Final Pick</div></div>
         </div>
 
         <div class="controls">
-            <button class="btn-next" id="submitBtn" onclick="makePick()">Submit Pick 185</button>
-            <button class="btn-reset" onclick="resetDraft()">Reset Tracker</button>
+            <button class="btn-next" id="mainBtn" onclick="submitPick()">Submit Pick 185</button>
+            <button class="btn-reset" onclick="resetAll()">Reset Tracker to 185</button>
         </div>
 
         <div class="nap-tracker">
-            <div class="nap-info">
-                <div style="font-size: 11px; color: #888; font-weight: bold;">RED'S NAP TIME</div>
-                <div class="nap-time" id="napTimeDisplay">00:00:00</div>
+            <div>
+                <div style="font-size: 10px; color: #555; font-weight: bold; letter-spacing: 1px;">RED'S NAP TIMER</div>
+                <div class="nap-time" id="napDisplay">00:00:00</div>
             </div>
             <div class="nap-controls">
-                <button id="napPlayBtn" onclick="startNap()">▶</button>
-                <button id="napPauseBtn" onclick="pauseNap()">⏸</button>
-                <button id="napResetBtn" onclick="resetNap()">↺</button>
+                <button id="napPlay" onclick="setNapActive(true)">▶</button>
+                <button id="napPause" onclick="setNapActive(false)">⏸</button>
+                <button onclick="resetNap()">↺</button>
             </div>
         </div>
 
-        <div class="history" id="historyLog"><div class="history-title">Recent Activity</div></div>
+        <div class="history" id="log"><div style="padding: 10px; text-align: center;">Draft Progress Tracking...</div></div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-firestore-compat.js"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // Use YOUR config credentials
-        const firebaseConfig = {
+        const config = {
             apiKey: "AIzaSyDecV3qGqmwD6T7B2TAHfb3FT5jegIWBLk",
             authDomain: "drafttracker-b6720.firebaseapp.com",
             projectId: "drafttracker-b6720",
@@ -262,129 +270,158 @@
             appId: "1:745753068393:web:5188024ae9abc9bd3573f8"
         };
 
-        firebase.initializeApp(firebaseConfig);
+        // Init
+        firebase.initializeApp(config);
         const db = firebase.firestore();
+        const auth = firebase.auth();
+        const appId = config.projectId;
+
+        // Path following Rule 1 (6 segments: artifacts/id/public/data/collection/doc)
+        const draftDoc = `artifacts/${appId}/public/data/draftState/current`;
+        const napDoc = `artifacts/${appId}/public/data/napState/current`;
+
+        document.getElementById('fixLink').href = `https://console.firebase.google.com/project/${appId}/firestore`;
 
         let currentPick = 185;
-        const finalPick = 257;
-        const round7StartPick = 217;
-        const paceRounds5and6 = 174; 
-        const paceRound7 = 139;
+        let napSeconds = 0;
+        let napActive = false;
+        let countdownSec = 0;
+        let globalTimer = null;
+        let napTicker = null;
 
-        function calculateRemainingSeconds(pickNum) {
+        function format(s) {
+            if (s <= 0) return "00:00:00";
+            const h = Math.floor(s / 3600).toString().padStart(2, '0');
+            const m = Math.floor((s % 3600) / 60).toString().padStart(2, '0');
+            const sec = (s % 60).toString().padStart(2, '0');
+            return `${h}:${m}:${sec}`;
+        }
+
+        // Calculation: R5/6 = 174s per pick. R7 (starts pick 217) = 139s per pick.
+        function getRemainingTime(pick) {
             let total = 0;
-            for (let i = pickNum; i <= finalPick; i++) {
-                total += (i >= round7StartPick) ? paceRound7 : paceRounds5and6;
+            for (let i = pick; i <= 257; i++) {
+                total += (i >= 217) ? 139 : 174;
             }
             return total;
         }
 
-        let totalSecondsRemaining = calculateRemainingSeconds(currentPick);
-        let timerInterval;
-
-        function formatTime(seconds) {
-            if (seconds <= 0) return "00:00:00";
-            const h = Math.floor(seconds / 3600);
-            const m = Math.floor((seconds % 3600) / 60);
-            const s = seconds % 60;
-            return [h, m, s].map(v => v.toString().padStart(2, '0')).join(':');
-        }
-
         function updateUI() {
-            document.getElementById('currentPickDisplay').innerText = currentPick;
-            document.getElementById('remainingCount').innerText = Math.max(0, finalPick - currentPick);
-            const btn = document.getElementById('submitBtn');
-            const display = document.getElementById('currentPickDisplay');
+            document.getElementById('pickDisplay').innerText = currentPick;
+            document.getElementById('countDisplay').innerText = Math.max(0, 257 - currentPick);
+            
+            const btn = document.getElementById('mainBtn');
+            const status = document.getElementById('statusLabel');
 
-            if (currentPick > finalPick) {
-                display.style.background = "var(--br-rainbow)";
-                display.style.backgroundSize = "300% 300%";
-                display.style.animation = "shimmer 4s linear infinite";
-                display.style.webkitBackgroundClip = "text";
-                display.style.webkitTextFillColor = "transparent";
-                btn.innerText = "Draft Complete";
+            if (currentPick > 257) {
+                status.innerText = "DRAFT COMPLETE";
+                btn.innerText = "MR. IRRELEVANT SET";
                 btn.disabled = true;
-                totalSecondsRemaining = 0;
+                countdownSec = 0;
             } else {
+                status.innerText = "ON THE CLOCK";
                 btn.innerText = `Submit Pick ${currentPick}`;
-                totalSecondsRemaining = calculateRemainingSeconds(currentPick);
+                btn.disabled = false;
+                countdownSec = getRemainingTime(currentPick);
             }
-            document.getElementById('timeRemaining').innerText = formatTime(totalSecondsRemaining);
+            document.getElementById('timerDisplay').innerText = format(countdownSec);
         }
 
-        function startTimer() {
-            clearInterval(timerInterval);
-            timerInterval = setInterval(() => {
-                if (totalSecondsRemaining > 0) {
-                    totalSecondsRemaining--;
-                    document.getElementById('timeRemaining').innerText = formatTime(totalSecondsRemaining);
-                }
-            }, 1000);
+        function addToLog(msg) {
+            const log = document.getElementById('log');
+            const div = document.createElement('div');
+            div.className = 'history-item';
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            div.innerHTML = `<span>${msg}</span><span>${time}</span>`;
+            log.prepend(div);
         }
 
-        function makePick() {
-            if (currentPick <= finalPick) {
+        async function syncState(path, data) {
+            try {
+                if (!auth.currentUser) await auth.signInAnonymously();
+                await db.doc(path).set(data, { merge: true });
+            } catch (e) {
+                console.error("Sync error", e);
+                if (e.code === 'permission-denied') document.getElementById('errorOverlay').style.display = 'block';
+            }
+        }
+
+        function submitPick() {
+            if (currentPick <= 257) {
+                const pickJustMade = currentPick;
                 currentPick++;
-                updateUI();
-                db.doc("draftData/current").set({ currentPick });
+                updateUI(); // Local update first for speed
+                addToLog(`Pick ${pickJustMade} Processed`);
+                syncState(draftDoc, { currentPick, lastUpdated: firebase.firestore.Timestamp.now() });
             }
         }
 
-        async function resetDraft() {
-            if (confirm("Reset to Pick 185?")) {
-                currentPick = 185;
-                updateUI();
-                db.doc("draftData/current").set({ currentPick });
-            }
+        async function resetAll() {
+            if (!confirm("Reset back to Pick 185?")) return;
+            currentPick = 185;
+            updateUI();
+            addToLog("Draft Reset to 185");
+            syncState(draftDoc, { currentPick });
         }
 
-        // --- Nap Timer Logic ---
-        let napSeconds = 0;
-        let napInterval = null;
-        let napIsRunning = false;
-
-        function updateNapDisplay() { document.getElementById('napTimeDisplay').innerText = formatTime(napSeconds); }
-
-        function startNap() {
-            if (!napInterval) {
-                napIsRunning = true;
-                napInterval = setInterval(() => { napSeconds++; updateNapDisplay(); }, 1000);
-                document.getElementById('napPlayBtn').classList.add('active');
-                db.doc("napData/current").set({ napSeconds, napIsRunning });
-            }
+        // Nap Tracker
+        function updateNapUI() {
+            document.getElementById('napDisplay').innerText = format(napSeconds);
+            document.getElementById('napPlay').className = napActive ? 'active' : '';
+            document.getElementById('napPause').className = (!napActive && napSeconds > 0) ? 'active' : '';
         }
 
-        function pauseNap() {
-            if (napInterval) {
-                napIsRunning = false;
-                clearInterval(napInterval);
-                napInterval = null;
-                document.getElementById('napPlayBtn').classList.remove('active');
-                db.doc("napData/current").set({ napSeconds, napIsRunning });
-            }
+        function setNapActive(active) {
+            napActive = active;
+            updateNapUI();
+            syncState(napDoc, { napActive, napSeconds });
         }
 
-        function resetNap() { pauseNap(); napSeconds = 0; updateNapDisplay(); db.doc("napData/current").set({ napSeconds, napIsRunning }); }
+        function resetNap() {
+            napActive = false;
+            napSeconds = 0;
+            updateNapUI();
+            syncState(napDoc, { napActive, napSeconds });
+        }
 
-        // --- REAL TIME SYNC ---
-        db.doc("draftData/current").onSnapshot(doc => {
-            if (doc.exists) {
-                currentPick = doc.data().currentPick;
-                updateUI();
+        // Tickers
+        setInterval(() => {
+            if (countdownSec > 0) {
+                countdownSec--;
+                document.getElementById('timerDisplay').innerText = format(countdownSec);
             }
-        });
+            if (napActive) {
+                napSeconds++;
+                updateNapUI();
+            }
+        }, 1000);
 
-        db.doc("napData/current").onSnapshot(doc => {
-            if (doc.exists) {
-                napSeconds = doc.data().napSeconds;
-                updateNapDisplay();
-                if (doc.data().napIsRunning && !napInterval) startNap();
-                else if (!doc.data().napIsRunning && napInterval) pauseNap();
-            }
-        });
+        // Firestore Listeners
+        async function startSync() {
+            if (!auth.currentUser) await auth.signInAnonymously();
+
+            db.doc(draftDoc).onSnapshot(doc => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    if (data.currentPick && data.currentPick !== currentPick) {
+                        currentPick = data.currentPick;
+                        updateUI();
+                    }
+                }
+            }, e => { if (e.code === 'permission-denied') document.getElementById('errorOverlay').style.display = 'block'; });
+
+            db.doc(napDoc).onSnapshot(doc => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    napSeconds = data.napSeconds || 0;
+                    napActive = data.napActive || false;
+                    updateNapUI();
+                }
+            });
+        }
 
         updateUI();
-        startTimer();
+        startSync();
     </script>
 </body>
 </html>
