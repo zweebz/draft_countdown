@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B/R LIVE | NFL Draft Tracker</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto+Condensed:wght@400;700&display=swap');
+
+        :root {
+            --br-black: #111111;
+            --br-grey: #222222;
+            --br-light-grey: #333333;
+            --br-white: #ffffff;
+            --br-rainbow: linear-gradient(90deg, #FFB7B2, #FFDAC1, #E2F0CB, #B5EAD7, #C7CEEA, #FFB7B2, #FFDAC1);
+            --br-pastel-blue: #C7CEEA;
+        }
+
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            background-color: var(--br-black);
+            color: var(--br-white);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-transform: uppercase;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background-color: var(--br-grey);
+            position: relative;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+            overflow: hidden;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--br-rainbow);
+            background-size: 300% 300%;
+            animation: shimmer 4s linear infinite;
+            z-index: 10;
+        }
+
+        .header {
+            background-color: var(--br-black);
+            padding: 20px 15px 15px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--br-light-grey);
+        }
+
+        .br-logo {
+            font-family: 'Oswald', sans-serif;
+            font-weight: 700;
+            font-size: 20px;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            background: var(--br-rainbow);
+            background-size: 300% 300%;
+            animation: shimmer 4s linear infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .live-tag {
+            color: var(--br-white);
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .live-tag::before {
+            content: "";
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: var(--br-rainbow);
+            background-size: 300% 300%;
+            border-radius: 50%;
+            margin-right: 6px;
+            animation: pulse 1.5s infinite, shimmer 4s linear infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        .main-pick {
+            padding: 40px 20px;
+            text-align: center;
+            background: linear-gradient(180deg, var(--br-grey) 0%, var(--br-black) 100%);
+        }
+
+        .label {
+            font-family: 'Oswald', sans-serif;
+            font-size: 18px;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            background: var(--br-rainbow);
+            background-size: 300% 300%;
+            animation: shimmer 4s linear infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .pick-number {
+            font-family: 'Oswald', sans-serif;
+            font-size: 110px;
+            line-height: 1;
+            font-weight: 700;
+            margin: 0;
+            color: var(--br-white);
+            text-shadow: 4px 4px 0px rgba(0,0,0,0.5);
+        }
+
+        .stats-bar {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            background-color: var(--br-black);
+            padding: 20px 0;
+            border-top: 1px solid var(--br-light-grey);
+            border-bottom: 1px solid var(--br-light-grey);
+        }
+
+        .stat-item {
+            text-align: center;
+            border-right: 1px solid var(--br-light-grey);
+        }
+
+        .stat-item:last-child {
+            border-right: none;
+        }
+
+        .stat-value {
+            font-family: 'Oswald', sans-serif;
+            font-size: 24px;
+            background: var(--br-rainbow);
+            background-size: 300% 300%;
+            animation: shimmer 4s linear infinite;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #888;
+            letter-spacing: 1px;
+            margin-top: 4px;
+        }
+
+        .controls {
+            padding: 25px;
+            background-color: var(--br-grey);
+        }
+
+        button {
+            width: 100%;
+            padding: 18px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            border: none;
+            transition: all 0.2s;
+        }
+
+        .btn-next {
+            background: var(--br-rainbow);
+            background-size: 300% 300%;
+            animation: shimmer 4s linear infinite;
+            color: var(--br-black);
+            margin-bottom: 15px;
+        }
+
+        .btn-next:hover {
+            filter: brightness(1.1);
+            transform: scale(1.01);
+        }
+
+        .btn-reset {
+            background-color: transparent;
+            color: #666;
+            font-size: 14px;
+            padding: 10px;
+            border: 1px solid #444;
+        }
+
+        .nap-tracker {
+            padding: 15px 25px;
+            background-color: var(--br-black);
+            border-top: 1px solid var(--br-light-grey);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nap-info {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+        }
+
+        .nap-title {
+            font-size: 11px;
+            color: #888;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+
+        .nap-time {
+            font-family: 'Oswald', sans-serif;
+            font-size: 24px;
+            color: var(--br-pastel-blue);
+        }
+
+        .nap-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nap-controls button {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            font-size: 16px;
+            background-color: var(--br-grey);
+            color: var(--br-white);
+            border: 1px solid #444;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nap-controls button.active {
+            background: var(--br-rainbow);
+            background-size: 300% 300%;
+            animation: shimmer 4s linear infinite;
+            color: var(--br-black);
+            border: none;
+        }
+
+        .history {
+            padding: 15px;
+            max-height: 120px;
+            overflow-y: auto;
+            background-color: var(--br-black);
+            font-size: 13px;
+            border-top: 1px solid var(--br-light-grey);
+        }
+
+        .history-title {
+            color: #555;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 11px;
+            position: sticky;
+            top: 0;
+            background: var(--br-black);
+        }
+
+        .history-item {
+            padding: 4px 0;
+            border-bottom: 1px solid #222;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .history-item span:first-child { color: #888; }
+        .history-item span:last-child { color: var(--br-pastel-blue); }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--br-black); }
+        ::-webkit-scrollbar-thumb { background: var(--br-light-grey); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <div class="br-logo">B/R NFL DRAFT SHOW</div>
+            <div class="live-tag">LIVE</div>
+        </div>
+
+        <div class="main-pick">
+            <div class="label" id="statusLabel">On The Clock</div>
+            <h1 class="pick-number" id="currentPickDisplay">185</h1>
+        </div>
+
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value" id="remainingCount">72</div>
+                <div class="stat-label">Picks Left</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="timeRemaining">00:00:00</div>
+                <div class="stat-label">Est. Time</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">257</div>
+                <div class="stat-label">Final Pick</div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn-next" id="submitBtn" onclick="makePick()">Submit Pick 185</button>
+            <button class="btn-reset" onclick="resetDraft()">Reset Tracker</button>
+        </div>
+
+        <div class="nap-tracker">
+            <div class="nap-info">
+                <div class="nap-title">RED'S NAP TIME</div>
+                <div class="nap-time" id="napTimeDisplay">00:00:00</div>
+            </div>
+            <div class="nap-controls">
+                <button id="napPlayBtn" onclick="startNap()" title="Play">▶</button>
+                <button id="napPauseBtn" onclick="pauseNap()" title="Pause">⏸</button>
+                <button id="napResetBtn" onclick="resetNap()" title="Reset">↺</button>
+            </div>
+        </div>
+
+        <div class="history" id="historyLog">
+            <div class="history-title">Recent Activity</div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Setup constants first
+        let currentPick = 185;
+        const finalPick = 257;
+        const round7StartPick = 217;
+        const paceRounds5and6 = 174; 
+        const paceRound7 = 139;
+
+        function calculateRemainingSeconds(pickNum) {
+            let total = 0;
+            for (let i = pickNum; i <= finalPick; i++) {
+                total += (i >= round7StartPick) ? paceRound7 : paceRounds5and6;
+            }
+            return total;
+        }
+
+        let totalSecondsRemaining = calculateRemainingSeconds(currentPick);
+        let timerInterval;
+
+        function formatTime(seconds) {
+            if (seconds <= 0) return "00:00:00";
+            const h = Math.floor(seconds / 3600);
+            const m = Math.floor((seconds % 3600) / 60);
+            const s = seconds % 60;
+            return [h, m, s].map(v => v.toString().padStart(2, '0')).join(':');
+        }
+
+        function addToLog(message) {
+            const log = document.getElementById('historyLog');
+            const newItem = document.createElement('div');
+            newItem.className = 'history-item';
+            const now = new Date();
+            const timeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+            newItem.innerHTML = `<span>${message}</span><span>${timeStr}</span>`;
+            
+            const title = log.querySelector('.history-title');
+            if (title && title.nextSibling) {
+                log.insertBefore(newItem, title.nextSibling);
+            } else {
+                log.appendChild(newItem);
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('currentPickDisplay').innerText = currentPick;
+            document.getElementById('remainingCount').innerText = Math.max(0, finalPick - currentPick);
+            
+            const btn = document.getElementById('submitBtn');
+            const label = document.getElementById('statusLabel');
+            const display = document.getElementById('currentPickDisplay');
+
+            if (currentPick > finalPick) {
+                display.style.background = "var(--br-rainbow)";
+                display.style.backgroundSize = "300% 300%";
+                display.style.animation = "shimmer 4s linear infinite";
+                display.style.webkitBackgroundClip = "text";
+                display.style.webkitTextFillColor = "transparent";
+                label.innerText = "Draft Complete";
+                btn.innerText = "Mr. Irrelevant Selected";
+                btn.disabled = true;
+                btn.style.opacity = "0.5";
+                totalSecondsRemaining = 0;
+            } else {
+                display.style.background = "none";
+                display.style.webkitBackgroundClip = "initial";
+                display.style.webkitTextFillColor = "initial";
+                display.style.color = "#ffffff";
+                btn.innerText = `Submit Pick ${currentPick}`;
+                btn.disabled = false;
+                btn.style.opacity = "1";
+                totalSecondsRemaining = calculateRemainingSeconds(currentPick);
+            }
+            document.getElementById('timeRemaining').innerText = formatTime(totalSecondsRemaining);
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                if (totalSecondsRemaining > 0) {
+                    totalSecondsRemaining--;
+                    document.getElementById('timeRemaining').innerText = formatTime(totalSecondsRemaining);
+                }
+            }, 1000);
+        }
+
+        function makePick() {
+            if (currentPick <= finalPick) {
+                addToLog(`Pick ${currentPick} Processed`);
+                currentPick++;
+                updateUI();
+                saveDraftState();
+            }
+        }
+
+        // --- Firebase Handling ---
+        let db, auth, appId;
+        let draftDocPath, napDocPath;
+
+        async function saveDraftState() {
+            if (!auth || !auth.currentUser) return;
+            try {
+                await db.doc(draftDocPath).set({
+                    currentPick: currentPick,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+            } catch (err) {}
+        }
+
+        const init = async () => {
+            try {
+                const firebaseConfig = JSON.parse(__firebase_config);
+                appId = typeof __app_id !== 'undefined' ? __app_id : 'draft-tracker-default';
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                auth = firebase.auth();
+                
+                draftDocPath = `artifacts/${appId}/public/data/draftState/current`;
+                napDocPath = `artifacts/${appId}/public/data/napState/current`;
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await auth.signInWithCustomToken(__initial_auth_token);
+                } else {
+                    await auth.signInAnonymously();
+                }
+
+                auth.onAuthStateChanged(user => {
+                    if (!user) return;
+                    db.doc(draftDocPath).onSnapshot(doc => {
+                        if (doc.exists) {
+                            const data = doc.data();
+                            if (data.currentPick && data.currentPick !== currentPick) {
+                                currentPick = data.currentPick;
+                                updateUI();
+                            }
+                        }
+                    });
+                    db.doc(napDocPath).onSnapshot(doc => {
+                        if (doc.exists) {
+                            const data = doc.data();
+                            napSeconds = data.napSeconds || 0;
+                            updateNapDisplay();
+                            if (data.napIsRunning && !napInterval) startNap(false);
+                            else if (!data.napIsRunning && napInterval) pauseNap(false);
+                        }
+                    });
+                });
+            } catch (err) {
+                console.error("Initialization Failed", err);
+            }
+        };
+
+        async function resetDraft() {
+            if (confirm("Reset tracking back to Pick 185?")) {
+                currentPick = 185;
+                updateUI();
+                await saveDraftState();
+            }
+        }
+
+        // --- Nap Timer Logic ---
+        let napSeconds = 0;
+        let napInterval = null;
+        let napIsRunning = false;
+
+        function updateNapDisplay() {
+            document.getElementById('napTimeDisplay').innerText = formatTime(napSeconds);
+        }
+
+        async function saveNapState() {
+            if (!auth || !auth.currentUser) return;
+            try {
+                await db.doc(napDocPath).set({ napSeconds, napIsRunning, lastUpdated: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
+            } catch (err) {}
+        }
+
+        function startNap(shouldSave = true) {
+            if (!napInterval) {
+                napIsRunning = true;
+                napInterval = setInterval(() => { napSeconds++; updateNapDisplay(); }, 1000);
+                document.getElementById('napPlayBtn').classList.add('active');
+                document.getElementById('napPauseBtn').classList.remove('active');
+                if (shouldSave) saveNapState();
+            }
+        }
+
+        function pauseNap(shouldSave = true) {
+            if (napInterval) {
+                napIsRunning = false;
+                clearInterval(napInterval);
+                napInterval = null;
+                document.getElementById('napPlayBtn').classList.remove('active');
+                document.getElementById('napPauseBtn').classList.add('active');
+                if (shouldSave) saveNapState();
+            }
+        }
+
+        function resetNap() {
+            pauseNap();
+            napSeconds = 0;
+            updateNapDisplay();
+            document.getElementById('napPauseBtn').classList.remove('active');
+            saveNapState();
+        }
+
+        // Start
+        updateUI();
+        startTimer();
+        init();
+    </script>
+</body>
+</html>
