@@ -3,468 +3,349 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B/R LIVE | NFL Draft Tracker</title>
+    <title>2026 NFL Draft Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto+Condensed:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; }
 
-        :root {
-            --br-black: #0a0a0a;
-            --br-grey: #1a1a1a;
-            --br-light-grey: #333333;
-            --br-white: #ffffff;
-            --br-rainbow: linear-gradient(90deg, #FFB7B2, #FFDAC1, #E2F0CB, #B5EAD7, #C7CEEA, #FFB7B2, #FFDAC1);
+        @keyframes pulse-red {
+            0%, 100% { background-color: rgba(220, 38, 38, 1); border-color: rgba(239, 68, 68, 1); }
+            50% { background-color: rgba(153, 27, 27, 1); border-color: rgba(220, 38, 38, 0.5); }
+        }
+        
+        .on-the-clock-pulse {
+            animation: pulse-red 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
 
-        body {
-            font-family: 'Roboto Condensed', sans-serif;
-            background-color: var(--br-black);
-            color: var(--br-white);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            text-transform: uppercase;
-            overflow: hidden;
-        }
+        .custom-scrollbar::-webkit-scrollbar { height: 4px; width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
 
-        .container {
-            width: 100%;
-            max-width: 500px;
-            background-color: var(--br-grey);
-            position: relative;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.9);
-            overflow: hidden;
-            border: 1px solid #222;
-            display: flex;
-            flex-direction: column;
-            height: 95vh;
+        .team-logo-shadow { filter: drop-shadow(0 0 8px rgba(0,0,0,0.5)); }
+        
+        .loading-shimmer {
+            background: linear-gradient(90deg, #0f172a 25%, #1e293b 50%, #0f172a 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
         }
-
-        .container::before {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 6px;
-            background: var(--br-rainbow);
-            background-size: 300% 300%;
-            animation: shimmer 4s linear infinite;
-            z-index: 10;
-        }
-
         @keyframes shimmer {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 300% 50%; }
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
-
-        .header {
-            background-color: var(--br-black);
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            border-bottom: 1px solid var(--br-light-grey);
-            flex-shrink: 0;
-        }
-
-        .br-logo {
-            font-family: 'Oswald', sans-serif;
-            font-weight: 700;
-            font-size: 20px;
-            background: var(--br-rainbow);
-            background-size: 300% auto;
-            animation: shimmer 4s linear infinite;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .api-status {
-            font-size: 9px;
-            color: #444;
-            letter-spacing: 1px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 2px;
-        }
-
-        .status-text { display: flex; align-items: center; gap: 5px; }
-        .api-status.active .status-text { color: #B5EAD7; }
-        .api-status.error .status-text { color: #FFB7B2; }
-        .last-check { font-size: 8px; color: #666; text-transform: none; }
-
-        .main-pick {
-            padding: 30px 20px;
-            text-align: center;
-            background: radial-gradient(circle at center, #222 0%, #0a0a0a 100%);
-            flex-shrink: 0;
-        }
-
-        .label {
-            font-family: 'Oswald', sans-serif;
-            font-size: 14px;
-            letter-spacing: 3px;
-            color: #666;
-            margin-bottom: 5px;
-        }
-
-        .pick-number {
-            font-family: 'Oswald', sans-serif;
-            font-size: 100px;
-            line-height: 1;
-            font-weight: 700;
-            margin: 0;
-            text-shadow: 0 10px 20px rgba(0,0,0,0.5);
-        }
-
-        .stats-bar {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            background-color: var(--br-black);
-            padding: 15px 0;
-            border-top: 1px solid #222;
-            border-bottom: 1px solid #222;
-            flex-shrink: 0;
-        }
-
-        .stat-item { text-align: center; border-right: 1px solid #222; }
-        .stat-item:last-child { border-right: none; }
-
-        .stat-value {
-            font-family: 'Oswald', sans-serif;
-            font-size: 20px;
-            background: var(--br-rainbow);
-            background-size: 300% auto;
-            animation: shimmer 3s linear infinite;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .stat-label { font-size: 9px; color: #666; letter-spacing: 1px; margin-top: 2px; }
-
-        .latest-selection {
-            background-color: #000;
-            margin: 15px;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            position: relative;
-            flex-shrink: 0;
-            min-height: 60px;
-        }
-
-        .latest-selection::after {
-            content: "LATEST SELECTION";
-            position: absolute;
-            top: -8px;
-            left: 15px;
-            background: var(--br-rainbow);
-            background-size: 300% auto;
-            animation: shimmer 3s linear infinite;
-            color: #000;
-            font-size: 9px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 4px;
-        }
-
-        .team-logo-main {
-            width: 55px; height: 55px;
-            background: #111; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            padding: 5px;
-            border: 1px solid #222;
-        }
-        .team-logo-main img { width: 100%; height: auto; }
-
-        .player-info { text-align: left; overflow: hidden; }
-        .player-name { font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 700; color: #fff; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .player-detail { font-size: 12px; color: #888; margin: 0; }
-
-        .board-header {
-            padding: 10px 15px;
-            background: #111;
-            font-size: 10px;
-            letter-spacing: 1px;
-            color: #555;
-            font-weight: 700;
-            border-bottom: 1px solid #222;
-        }
-
-        .history-container {
-            flex-grow: 1;
-            overflow-y: auto;
-            background: #050505;
-        }
-
-        table { width: 100%; border-collapse: collapse; font-size: 12px; }
-        th {
-            position: sticky; top: 0; background: #111;
-            padding: 8px 15px; text-align: left; color: #444;
-            font-size: 9px; z-index: 5;
-        }
-        td { padding: 12px 15px; border-bottom: 1px solid #111; color: #ccc; }
-        .td-pick { font-family: 'Oswald', sans-serif; color: #444; width: 30px; font-size: 14px; }
-        .td-team { width: 40px; text-align: center; }
-        .td-team img { width: 24px; height: auto; opacity: 0.9; }
-        .td-player { font-weight: 700; color: #fff; font-size: 13px; }
-        .td-school { color: #666; font-size: 10px; letter-spacing: 0.5px; }
-
-        .footer {
-            padding: 12px;
-            background-color: var(--br-black);
-            font-size: 9px;
-            color: #333;
-            text-align: center;
-            border-top: 1px solid #222;
-            flex-shrink: 0;
-            letter-spacing: 1px;
-        }
-
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #050505; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 5px; }
     </style>
 </head>
-<body>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
 
-    <div class="container">
-        <div class="header">
-            <div>
-                <div class="br-logo">B/R NFL DRAFT SHOW</div>
-                <div id="apiIndicator" class="api-status">
-                    <div class="status-text">ESPN CORE: CONNECTING...</div>
-                    <div id="lastSyncTime" class="last-check">Extension required...</div>
+    <div id="app" class="max-w-6xl mx-auto px-4 py-6 md:py-10">
+        <!-- Header -->
+        <header class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-10 border-b border-slate-800 pb-10">
+            <div class="space-y-2">
+                <div class="flex items-center gap-3">
+                    <span class="bg-blue-600 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-[0.2em]">NFL • 2026</span>
+                    <div class="w-1 h-1 rounded-full bg-slate-700"></div>
+                    <span class="text-slate-500 text-[10px] font-black uppercase tracking-widest">Draft Central</span>
+                </div>
+                <h1 class="text-4xl md:text-5xl font-black tracking-tighter italic uppercase leading-none">
+                    Live <span class="text-blue-500">Board</span>
+                </h1>
+                <div class="flex items-center gap-3">
+                    <p class="text-slate-400 text-sm font-bold flex items-center gap-2" id="draft-status-text">
+                        <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
+                        Connecting to Feed...
+                    </p>
+                    <span id="update-timestamp" class="text-[10px] text-slate-600 uppercase font-black"></span>
                 </div>
             </div>
-            <div id="liveTag" class="api-status" style="color:#ff4444; font-weight:bold;">LIVE SYNC</div>
-        </div>
 
-        <div class="main-pick">
-            <div class="label">ON THE CLOCK</div>
-            <h1 class="pick-number" id="pickDisplay">---</h1>
-        </div>
-
-        <div class="stats-bar">
-            <div class="stat-item"><div class="stat-value" id="countDisplay">0</div><div class="stat-label">Picks Left</div></div>
-            <div class="stat-item"><div class="stat-value" id="timerDisplay">00:00:00</div><div class="stat-label">Est. Time</div></div>
-            <div class="stat-item"><div class="stat-value">257</div><div class="stat-label">Final Pick</div></div>
-        </div>
-
-        <div class="latest-selection" id="latestCard">
-            <div class="team-logo-main" id="latestLogo">
-                <svg viewBox="0 0 24 24" fill="#333" width="30"><path d="M12 2L2 7v10l10 5 10-5V7L12 2z"/></svg>
+            <!-- On The Clock Spotlight -->
+            <div id="clock-container" class="hidden w-full lg:w-96">
+                <div class="on-the-clock-pulse rounded-2xl p-5 shadow-2xl border flex items-center gap-5 transition-all duration-500">
+                    <div class="relative">
+                        <div class="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-sm overflow-hidden border border-white/10">
+                            <img id="clock-team-logo" src="" class="w-10 h-10 object-contain team-logo-shadow hidden" alt="">
+                            <span id="clock-team-id" class="text-xl font-black text-white/50 italic">--</span>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-[10px] uppercase font-black text-red-100 tracking-[0.15em] mb-1">On The Clock</p>
+                        <p class="text-2xl font-black text-white italic tracking-tight uppercase leading-tight" id="clock-team-name">Loading...</p>
+                    </div>
+                </div>
             </div>
-            <div class="player-info">
-                <p class="player-name" id="latestName">Waiting for signal...</p>
-                <p class="player-detail" id="latestDetail">Direct API Sync</p>
+        </header>
+
+        <!-- Round Navigation -->
+        <nav class="flex gap-2 mb-8 overflow-x-auto pb-4 custom-scrollbar" id="round-nav">
+            <!-- Buttons injected here -->
+        </nav>
+
+        <!-- Draft Board Table -->
+        <div class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-950/80 backdrop-blur-md text-slate-500 text-[10px] uppercase font-black tracking-[0.2em] border-b border-slate-800">
+                            <th class="px-8 py-5">Pick</th>
+                            <th class="px-8 py-5">Team</th>
+                            <th class="px-8 py-5">Selection / Player Profile</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pick-rows" class="divide-y divide-slate-800/50">
+                        <tr class="loading-shimmer"><td colspan="3" class="h-24"></td></tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <div class="board-header">RECENT SELECTIONS</div>
-        <div class="history-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th class="td-pick">PK</th>
-                        <th class="td-team">TM</th>
-                        <th>PLAYER / SCHOOL</th>
-                    </tr>
-                </thead>
-                <tbody id="draftBoardBody"></tbody>
-            </table>
-        </div>
-
-        <div class="footer">
-            ESPN CORE API V2 | FULL AUTOMATION
-        </div>
+        <footer class="mt-12 flex flex-col md:flex-row justify-between items-center gap-6 border-t border-slate-800 pt-8">
+            <div class="flex items-center gap-4">
+                <div class="bg-slate-800 px-3 py-1 rounded-md">
+                    <p class="text-slate-500 text-[10px] uppercase tracking-widest font-black">Data Source: ESPN Core API</p>
+                </div>
+                <div class="bg-slate-800 px-3 py-1 rounded-md">
+                    <p class="text-slate-500 text-[10px] uppercase tracking-widest font-black">Sync: Athlete Info & Team V2</p>
+                </div>
+            </div>
+            <button onclick="fetchDraftData()" class="group bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-3 active:scale-95 shadow-lg shadow-blue-900/20">
+                <svg class="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                Sync Live Data
+            </button>
+        </footer>
     </div>
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore-compat.js"></script>
-
     <script>
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'br-draft-show-v2';
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-        const draftPath = `artifacts/${appId}/public/data/draftState/current`;
+        const API_URL = 'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/draft/rounds?lang=en&region=us';
+        const ATHLETE_BASE_URL = 'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/draft/athletes';
+        const REFRESH_INTERVAL = 45000;
 
-        let currentPickNum = 0;
-        let pickHistory = [];
-        const apiCache = new Map();
+        // In-memory caches for all entities
+        const cache = {
+            athletes: new Map(),
+            teams: new Map(),
+            loading: new Set()
+        };
 
-        function format(s) {
-            if (s <= 0) return "00:00:00";
-            const h = Math.floor(s / 3600).toString().padStart(2, '0');
-            const m = Math.floor((s % 3600) / 60).toString().padStart(2, '0');
-            const sec = (s % 60).toString().padStart(2, '0');
-            return `${h}:${m}:${sec}`;
+        let currentData = null;
+        let activeRoundNumber = null;
+        let isRefreshing = false;
+
+        function getId(ref) {
+            if (!ref) return null;
+            const parts = ref.split('/');
+            return parts[parts.length - 1].split('?')[0];
+        }
+
+        async function fetchDetails(type, id, urlOverride = null) {
+            const cacheKey = `${type}-${id}`;
+            if (cache[type].has(id) || cache.loading.has(cacheKey)) return;
+            
+            cache.loading.add(cacheKey);
+            try {
+                const url = urlOverride ? urlOverride.replace('http:', 'https:') : `${ATHLETE_BASE_URL}/${id}?lang=en&region=us`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Detail fetch error');
+                const data = await response.json();
+                
+                if (type === 'athletes') {
+                    cache.athletes.set(id, {
+                        name: data.displayName || 'Unknown Player',
+                        position: data.position?.abbreviation || 'N/A',
+                        school: data.college?.name || null
+                    });
+                } else if (type === 'teams') {
+                    cache.teams.set(id, {
+                        name: data.displayName || data.name || 'Team',
+                        logo: data.logos?.[0]?.href || null,
+                        color: data.color || '1e293b'
+                    });
+                }
+                
+                renderPicks();
+                updateLiveIndicator();
+            } catch (err) {
+                console.error(`Error fetching ${type} ${id}:`, err);
+            } finally {
+                cache.loading.delete(cacheKey);
+            }
+        }
+
+        async function fetchDraftData() {
+            if (isRefreshing) return;
+            isRefreshing = true;
+            
+            const statusText = document.getElementById('draft-status-text');
+            statusText.innerText = "Syncing Rounds...";
+
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('API Unavailable');
+                
+                const data = await response.json();
+                currentData = data;
+                
+                if (activeRoundNumber === null) {
+                    const liveRound = data.items.find(r => r.status?.type?.state === 'in');
+                    activeRoundNumber = liveRound ? liveRound.number : 1;
+                }
+
+                updateUI();
+                
+                const now = new Date();
+                document.getElementById('update-timestamp').innerText = `Sync: ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+                statusText.innerText = liveRoundLabel();
+            } catch (error) {
+                console.error("Fetch error:", error);
+                statusText.innerText = "Data Sync Error";
+            } finally {
+                isRefreshing = false;
+            }
+        }
+
+        function liveRoundLabel() {
+            const liveRound = currentData.items.find(r => r.status?.type?.state === 'in');
+            return liveRound ? `Round ${liveRound.number} Live` : "Finalized Draft Board";
         }
 
         function updateUI() {
-            if (currentPickNum === 0) return;
-            
-            document.getElementById('pickDisplay').innerText = currentPickNum;
-            document.getElementById('countDisplay').innerText = Math.max(0, 257 - currentPickNum);
-            
-            let countdownSec = 0;
-            for (let i = currentPickNum; i <= 257; i++) {
-                countdownSec += (i >= 217) ? 139 : 174;
-            }
-            document.getElementById('timerDisplay').innerText = format(countdownSec);
+            renderRoundNav();
+            renderPicks();
+            updateLiveIndicator();
+        }
 
-            if (pickHistory.length > 0) {
-                const latest = pickHistory[0];
-                document.getElementById('latestName').innerText = latest.player;
-                document.getElementById('latestDetail').innerText = `${latest.pos} | ${latest.school}`;
-                if (latest.logo) {
-                    document.getElementById('latestLogo').innerHTML = `<img src="${latest.logo}" alt="team">`;
-                }
-            }
+        function renderRoundNav() {
+            const nav = document.getElementById('round-nav');
+            nav.innerHTML = '';
             
-            const tbody = document.getElementById('draftBoardBody');
-            tbody.innerHTML = '';
-            pickHistory.slice(0, 10).forEach(pick => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="td-pick">${pick.number}</td>
-                    <td class="td-team">${pick.logo ? `<img src="${pick.logo}" alt="">` : ''}</td>
-                    <td>
-                        <div class="td-player">${pick.player || "Selection"}</div>
-                        <div class="td-school">${pick.pos || ""} ${pick.school ? "| " + pick.school : ""}</div>
-                    </td>
-                `;
-                tbody.appendChild(row);
+            currentData.items.forEach(round => {
+                const btn = document.createElement('button');
+                const isLive = round.status?.type?.state === 'in';
+                const isActive = activeRoundNumber === round.number;
+                
+                btn.className = `px-6 py-3 rounded-2xl text-[11px] font-black tracking-widest uppercase transition-all whitespace-nowrap border ${
+                    isActive 
+                    ? 'bg-blue-600 border-blue-400 text-white shadow-xl shadow-blue-900/40 translate-y-[-2px]' 
+                    : 'bg-slate-800/50 border-slate-700 text-slate-500 hover:bg-slate-700 hover:text-slate-300'
+                }`;
+                
+                btn.innerHTML = `Round ${round.number} ${isLive ? '<span class="ml-2 w-2 h-2 rounded-full bg-red-500 inline-block animate-ping"></span>' : ''}`;
+                btn.onclick = () => {
+                    activeRoundNumber = round.number;
+                    updateUI();
+                };
+                nav.appendChild(btn);
             });
         }
 
-        // Direct fetch with https forcing
-        async function fetchDirect(url) {
-            const secureUrl = url.replace('http://', 'https://');
-            const res = await fetch(secureUrl);
-            if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
-            return await res.json();
-        }
+        function renderPicks() {
+            const round = currentData.items.find(r => r.number === activeRoundNumber);
+            const tbody = document.getElementById('pick-rows');
+            
+            if (!round || !round.picks) return;
 
-        async function resolveDetail(url) {
-            if (!url) return null;
-            if (apiCache.has(url)) return apiCache.get(url);
-            try {
-                const data = await fetchDirect(url);
-                apiCache.set(url, data);
-                return data;
-            } catch (e) { return null; }
-        }
+            tbody.innerHTML = '';
+            round.picks.forEach(pick => {
+                const teamId = getId(pick.team?.$ref);
+                const athleteId = getId(pick.athlete?.$ref);
+                const isOnClock = pick.status?.name === "ON_THE_CLOCK";
+                const isSelected = pick.status?.name === "SELECTION_MADE";
 
-        async function syncEspn() {
-            const apiIndicator = document.getElementById('apiIndicator');
-            const statusText = apiIndicator.querySelector('.status-text');
-            const syncTimeText = document.getElementById('lastSyncTime');
+                // Team Details
+                if (teamId && !cache.teams.has(teamId)) fetchDetails('teams', teamId, pick.team.$ref);
+                const team = cache.teams.get(teamId);
 
-            try {
-                // 1. Get Rounds
-                const roundsUrl = 'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/draft/rounds?lang=en&region=us';
-                const roundsData = await fetchDirect(roundsUrl);
+                // Athlete Details
+                let playerHtml = '';
+                if (isSelected && athleteId) {
+                    if (cache.athletes.has(athleteId)) {
+                        const player = cache.athletes.get(athleteId);
+                        playerHtml = `
+                            <div class="flex flex-col gap-0.5">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-blue-500 text-[10px] font-black uppercase tracking-widest leading-none">Drafted</span>
+                                    ${pick.traded ? '<span class="bg-amber-500/10 text-amber-500 text-[8px] font-black px-1.5 py-0.5 rounded uppercase border border-amber-500/20">Traded Pick</span>' : ''}
+                                </div>
+                                <span class="text-lg font-black text-white tracking-tight uppercase">${player.name}</span>
+                                <span class="text-[11px] text-slate-500 font-bold uppercase tracking-widest">
+                                    ${player.position} ${player.school ? `• ${player.school}` : ''}
+                                </span>
+                                ${pick.traded ? `<span class="text-[10px] text-slate-600 font-medium italic mt-0.5">${pick.tradeNote}</span>` : ''}
+                            </div>
+                        `;
+                    } else {
+                        fetchDetails('athletes', athleteId);
+                        playerHtml = `<div class="flex flex-col gap-2"><div class="h-3 w-16 bg-slate-800 animate-pulse rounded"></div><div class="h-6 w-48 bg-slate-800 animate-pulse rounded-lg"></div></div>`;
+                    }
+                } else {
+                    playerHtml = `
+                        <div class="flex flex-col gap-3">
+                            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border w-fit ${isOnClock ? 'bg-red-600/10 border-red-500/50 text-red-500 animate-pulse' : 'bg-slate-800 border-slate-700 text-slate-500'}">
+                                <span class="text-[10px] font-black uppercase tracking-widest">${pick.status?.description || 'Waiting'}</span>
+                            </div>
+                            ${pick.traded ? `<div class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span><span class="text-[10px] text-slate-500 font-bold uppercase tracking-tight">${pick.tradeNote}</span></div>` : ''}
+                        </div>
+                    `;
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = `group border-b border-slate-800/40 transition-all duration-300 ${isOnClock ? 'bg-blue-950/30' : 'hover:bg-slate-800/20'}`;
                 
-                if (roundsData && roundsData.items) {
-                    let allRawPicks = [];
-                    let onClockPickNum = null;
-
-                    // 2. Fetch picks for most recent rounds (backwards)
-                    for (let i = roundsData.items.length - 1; i >= 0; i--) {
-                        try {
-                            const picksData = await fetchDirect(roundsData.items[i].picks.$ref);
-                            if (picksData && picksData.items) {
-                                allRawPicks = allRawPicks.concat(picksData.items);
-                                // On The Clock status = 1
-                                const clock = picksData.items.find(p => p.status && p.status.id === 1);
-                                if (clock && !onClockPickNum) onClockPickNum = clock.overall;
-                            }
-                            // Stop once we have enough data
-                            if (allRawPicks.filter(p => p.status && p.status.id === 3).length >= 10) break;
-                        } catch(e) { continue; }
-                    }
-
-                    // 3. Resolve detail for completed picks
-                    const completed = allRawPicks.filter(p => p.status && p.status.id === 3).sort((a, b) => b.overall - a.overall);
-                    const latestTen = completed.slice(0, 10);
-
-                    const resolvedHistory = [];
-                    for (const p of latestTen) {
-                        try {
-                            const athlete = await resolveDetail(p.athlete.$ref);
-                            const team = await resolveDetail(p.team.$ref);
-                            resolvedHistory.push({
-                                number: p.overall,
-                                player: athlete ? athlete.displayName : "Selection Made",
-                                pos: (athlete && athlete.position) ? athlete.position.abbreviation : "TBD",
-                                school: (athlete && athlete.college) ? (athlete.college.displayName || "College") : "N/A",
-                                logo: (team && team.logos) ? team.logos[0].href : null
-                            });
-                        } catch(e) {
-                            resolvedHistory.push({ number: p.overall, player: "Syncing...", pos: "TBD", school: "", logo: null });
-                        }
-                    }
-
-                    if (resolvedHistory.length > 0) {
-                        pickHistory = resolvedHistory;
-                        const latestMade = resolvedHistory[0].number;
-                        const nextPick = onClockPickNum || (latestMade + 1);
-
-                        if (nextPick > currentPickNum) {
-                            currentPickNum = nextPick;
-                            if (auth.currentUser) {
-                                await db.doc(draftPath).set({ 
-                                    currentPick: currentPickNum, 
-                                    history: pickHistory, 
-                                    lastSync: Date.now() 
-                                }, { merge: true });
-                            }
-                        }
-                    }
-
-                    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                    syncTimeText.innerText = `Sync: ${now}`;
-                    statusText.innerText = "ESPN CORE: ACTIVE";
-                    apiIndicator.className = 'api-status active';
-                    updateUI();
-                }
-            } catch (e) {
-                console.error("Direct fetch error", e);
-                statusText.innerText = "ESPN CORE: ERROR (CORS?)";
-                apiIndicator.className = 'api-status error';
-                syncTimeText.innerText = "Enable CORS extension and refresh";
-            }
+                tr.innerHTML = `
+                    <td class="px-8 py-6 whitespace-nowrap">
+                        <div class="text-2xl font-black text-slate-400 group-hover:text-blue-400 transition-colors tracking-tighter">#${pick.overall || pick.pick}</div>
+                        <div class="text-[10px] text-slate-600 uppercase font-black tracking-widest">Pick ${pick.pick}</div>
+                    </td>
+                    <td class="px-8 py-6 whitespace-nowrap">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-slate-800/80 border border-slate-700 p-2 flex items-center justify-center shadow-lg group-hover:border-slate-500 transition-colors">
+                                ${team?.logo ? `<img src="${team.logo}" class="w-full h-full object-contain team-logo-shadow" />` : `<span class="text-xs font-black text-slate-600">${teamId}</span>`}
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="font-black text-sm text-white tracking-wide uppercase">${team?.name || 'Loading...'}</span>
+                                <span class="text-[9px] text-slate-500 font-bold uppercase tracking-[0.2em]">NFL Franchise</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-8 py-6">
+                        ${playerHtml}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
         }
 
-        async function initFirebaseSync() {
-            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                await auth.signInWithCustomToken(__initial_auth_token);
+        function updateLiveIndicator() {
+            const allPicks = currentData.items.flatMap(r => r.picks || []);
+            const onClock = allPicks.find(p => p.status?.name === "ON_THE_CLOCK");
+            const clockContainer = document.getElementById('clock-container');
+
+            if (onClock) {
+                const teamId = getId(onClock.team?.$ref);
+                const team = cache.teams.get(teamId);
+                
+                document.getElementById('clock-team-name').innerText = team ? team.name : 'Loading...';
+                const logoImg = document.getElementById('clock-team-logo');
+                const idText = document.getElementById('clock-team-id');
+                
+                if (team?.logo) {
+                    logoImg.src = team.logo;
+                    logoImg.classList.remove('hidden');
+                    idText.classList.add('hidden');
+                } else {
+                    idText.innerText = teamId;
+                    idText.classList.remove('hidden');
+                    logoImg.classList.add('hidden');
+                }
+                
+                clockContainer.classList.remove('hidden');
             } else {
-                await auth.signInAnonymously();
+                clockContainer.classList.add('hidden');
             }
-
-            db.doc(draftPath).onSnapshot(doc => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    if (data.currentPick > currentPickNum) currentPickNum = data.currentPick;
-                    if (data.history) pickHistory = data.history;
-                    updateUI();
-                }
-            }, err => console.error("Firebase Error", err));
         }
 
-        initFirebaseSync();
-        // Polling set to 25s
-        setInterval(syncEspn, 25000); 
-        syncEspn();
+        setInterval(fetchDraftData, REFRESH_INTERVAL);
+        fetchDraftData();
     </script>
 </body>
 </html>
