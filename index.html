@@ -308,8 +308,8 @@
         const draftPath = `artifacts/${config.projectId}/public/data/draftState/current`;
 
         let currentPick = 204;
-        let countdownSec = 0;
         let pickHistory = [];
+        let cache = { athletes: {}, teams: {} };
 
         function format(s) {
             if (s <= 0) return "00:00:00";
@@ -324,35 +324,31 @@
             document.getElementById('countDisplay').innerText = Math.max(0, 257 - currentPick);
             document.getElementById('mainBtn').innerText = currentPick > 257 ? "DRAFT COMPLETE" : `Submit Pick ${currentPick}`;
             
-            // Est Time
-            countdownSec = 0;
+            let countdownSec = 0;
             for (let i = currentPick; i <= 257; i++) {
                 countdownSec += (i >= 217) ? 139 : 174;
             }
             document.getElementById('timerDisplay').innerText = format(countdownSec);
 
-            // Latest Card
             if (pickHistory.length > 0) {
                 const latest = pickHistory[0];
-                document.getElementById('latestName').innerText = latest.player;
-                document.getElementById('latestDetail').innerText = `${latest.pos} | ${latest.school}`;
+                document.getElementById('latestName').innerText = latest.player || "Selected";
+                document.getElementById('latestDetail').innerText = `${latest.pos || "-"} | ${latest.school || "-"}`;
                 if (latest.logo) {
                     document.getElementById('latestLogo').innerHTML = `<img src="${latest.logo}" alt="team">`;
                 }
             }
             
-            // Table
             const tbody = document.getElementById('draftBoardBody');
             tbody.innerHTML = '';
-            // Show up to 15 recent picks
             pickHistory.slice(0, 15).forEach(pick => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td class="td-pick">${pick.number}</td>
                     <td class="td-team">${pick.logo ? `<img src="${pick.logo}" alt="">` : '-'}</td>
                     <td>
-                        <div class="td-player">${pick.player}</div>
-                        <div class="td-school">${pick.pos} | ${pick.school}</div>
+                        <div class="td-player">${pick.player || "Loading..."}</div>
+                        <div class="td-school">${pick.pos || ""} | ${pick.school || ""}</div>
                     </td>
                 `;
                 tbody.appendChild(row);
@@ -369,36 +365,50 @@
             }
         }
 
-        // --- RESILIENT ESPN FETCH ---
+        // --- CORE API SYNC ---
+        async function fetchWithProxy(url) {
+            const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
+            if (!response.ok) throw new Error();
+            return await response.json();
+        }
+
+        async function getDetail(url, cacheType) {
+            if (cache[cacheType][url]) return cache[cacheType][url];
+            try {
+                const data = await fetchWithProxy(url);
+                cache[cacheType][url] = data;
+                return data;
+            } catch (e) { return null; }
+        }
+
         async function fetchEspnDraft() {
             const apiIndicator = document.getElementById('apiIndicator');
             const statusText = apiIndicator.querySelector('.status-text');
             const syncTimeText = document.getElementById('lastSyncTime');
 
-            // Trying AllOrigins specifically for the site-api which contains player details
-            const targetUrl = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/draft/board';
-            
             try {
-                const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}&timestamp=${Date.now()}`);
-                if (!response.ok) throw new Error();
-                const result = await response.json();
-                const data = JSON.parse(result.contents);
+                // Correct Core API URL provided by user
+                const picksUrl = 'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/draft/picks?limit=257';
+                const picksData = await fetchWithProxy(picksUrl);
                 
-                if (data && data.draft && data.draft.picks) {
-                    const allPicks = data.draft.picks;
-                    const madePicks = allPicks.filter(p => p.player);
-                    
-                    const newHistory = madePicks.map(p => ({
-                        number: p.overall,
-                        player: p.player.displayName,
-                        pos: p.player.position,
-                        school: p.player.school,
-                        logo: p.team ? p.team.logo : null,
-                        team: p.team ? p.team.displayName : 'TBD'
-                    })).sort((a, b) => b.number - a.number);
+                if (picksData && picksData.items) {
+                    const sortedPicks = picksData.items.sort((a, b) => b.number - a.number);
+                    const rawHistory = sortedPicks.filter(p => p.athlete).slice(0, 15);
 
-                    pickHistory = newHistory;
-                    const latestMade = newHistory.length > 0 ? newHistory[0].number : 0;
+                    const resolvedHistory = await Promise.all(rawHistory.map(async p => {
+                        const athlete = await getDetail(p.athlete.$ref, 'athletes');
+                        const team = await getDetail(p.team.$ref, 'teams');
+                        return {
+                            number: p.number,
+                            player: athlete ? athlete.displayName : "Unknown",
+                            pos: athlete && athlete.position ? athlete.position.abbreviation : "",
+                            school: athlete && athlete.collegeAthlete ? athlete.collegeAthlete.school.name : "",
+                            logo: team && team.logos ? team.logos[0].href : null
+                        };
+                    }));
+
+                    pickHistory = resolvedHistory;
+                    const latestMade = pickHistory.length > 0 ? pickHistory[0].number : 0;
                     
                     if (latestMade + 1 > currentPick) {
                         currentPick = latestMade + 1;
@@ -412,7 +422,8 @@
                     updateUI();
                 }
             } catch (e) {
-                statusText.innerText = "ESPN API: RETRYING...";
+                console.error("Fetch Error", e);
+                statusText.innerText = "ESPN API: ERROR";
                 apiIndicator.className = 'api-status error';
             }
         }
@@ -421,16 +432,16 @@
             if (!auth.currentUser) await auth.signInAnonymously();
             await db.doc(draftPath).set({ 
                 currentPick, 
-                history: pickHistory.slice(0, 20),
+                history: pickHistory.slice(0, 15),
                 lastUpdated: Date.now() 
             }, { merge: true });
         }
 
-        setInterval(fetchEspnDraft, 15000);
+        setInterval(fetchEspnDraft, 20000);
         fetchEspnDraft();
 
         async function resetTo204() {
-            if (confirm("Reset to 204?")) {
+            if (confirm("Reset to Pick 204?")) {
                 currentPick = 204;
                 pickHistory = [];
                 updateUI();
@@ -439,28 +450,16 @@
             }
         }
 
-        setInterval(() => {
-            if (countdownSec > 0) {
-                countdownSec--;
-                document.getElementById('timerDisplay').innerText = format(countdownSec);
-            }
-        }, 1000);
-
         async function startSync() {
             if (!auth.currentUser) await auth.signInAnonymously();
-            
             db.doc(draftPath).onSnapshot(doc => {
                 if (doc.exists) {
                     const data = doc.data();
                     if (data.currentPick && data.currentPick > currentPick) {
                         currentPick = data.currentPick;
                     }
-                    if (data.history) {
-                        const merged = [...data.history, ...pickHistory];
-                        const unique = Array.from(new Set(merged.map(a => a.number)))
-                            .map(num => merged.find(a => a.number === num))
-                            .sort((a, b) => b.number - a.number);
-                        pickHistory = unique;
+                    if (data.history && (!pickHistory.length || data.history[0].number > pickHistory[0].number)) {
+                        pickHistory = data.history;
                     }
                     updateUI();
                 }
