@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B/R LIVE | 2026 NFL Draft Tracker</title>
+    <title>B/R LIVE | NFL Draft Tracker</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto+Condensed:wght@400;700&display=swap');
 
@@ -25,11 +25,12 @@
             align-items: center;
             min-height: 100vh;
             text-transform: uppercase;
+            overflow: hidden;
         }
 
         .container {
             width: 100%;
-            max-width: 480px;
+            max-width: 500px;
             background-color: var(--br-grey);
             position: relative;
             box-shadow: 0 20px 50px rgba(0,0,0,0.9);
@@ -40,15 +41,14 @@
             height: 95vh;
         }
 
-        /* Active RGB Shimmer Border */
         .container::before {
             content: "";
             position: absolute;
             top: 0; left: 0; right: 0;
             height: 6px;
             background: var(--br-rainbow);
-            background-size: 300% auto;
-            animation: shimmer 3s linear infinite;
+            background-size: 300% 300%;
+            animation: shimmer 4s linear infinite;
             z-index: 10;
         }
 
@@ -70,10 +70,10 @@
         .br-logo {
             font-family: 'Oswald', sans-serif;
             font-weight: 700;
-            font-size: 18px;
+            font-size: 20px;
             background: var(--br-rainbow);
             background-size: 300% auto;
-            animation: shimmer 3s linear infinite;
+            animation: shimmer 4s linear infinite;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -94,15 +94,23 @@
         .last-check { font-size: 8px; color: #666; text-transform: none; }
 
         .main-pick {
-            padding: 25px 20px;
+            padding: 30px 20px;
             text-align: center;
             background: radial-gradient(circle at center, #222 0%, #0a0a0a 100%);
             flex-shrink: 0;
         }
 
+        .label {
+            font-family: 'Oswald', sans-serif;
+            font-size: 14px;
+            letter-spacing: 3px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
         .pick-number {
             font-family: 'Oswald', sans-serif;
-            font-size: 110px;
+            font-size: 100px;
             line-height: 1;
             font-weight: 700;
             margin: 0;
@@ -113,7 +121,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             background-color: var(--br-black);
-            padding: 12px 0;
+            padding: 15px 0;
             border-top: 1px solid #222;
             border-bottom: 1px solid #222;
             flex-shrink: 0;
@@ -134,7 +142,6 @@
 
         .stat-label { font-size: 9px; color: #666; letter-spacing: 1px; margin-top: 2px; }
 
-        /* Latest Selection Card */
         .latest-selection {
             background-color: #000;
             margin: 15px;
@@ -146,6 +153,7 @@
             gap: 15px;
             position: relative;
             flex-shrink: 0;
+            min-height: 60px;
         }
 
         .latest-selection::after {
@@ -176,7 +184,6 @@
         .player-name { font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 700; color: #fff; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .player-detail { font-size: 12px; color: #888; margin: 0; }
 
-        /* Full Draft Board */
         .board-header {
             padding: 10px 15px;
             background: #111;
@@ -206,24 +213,16 @@
         .td-player { font-weight: 700; color: #fff; font-size: 13px; }
         .td-school { color: #666; font-size: 10px; letter-spacing: 0.5px; }
 
-        .controls { padding: 20px; background-color: var(--br-grey); flex-shrink: 0; border-top: 1px solid #222; }
-
-        .btn-next {
-            background: var(--br-rainbow);
-            background-size: 300% auto;
-            animation: shimmer 3s linear infinite;
-            color: #000;
-            font-family: 'Oswald', sans-serif;
-            font-size: 20px;
-            font-weight: 700;
-            border-radius: 4px;
-            padding: 16px;
-            cursor: pointer;
-            border: none;
-            width: 100%;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        .footer {
+            padding: 12px;
+            background-color: var(--br-black);
+            font-size: 9px;
+            color: #333;
+            text-align: center;
+            border-top: 1px solid #222;
+            flex-shrink: 0;
+            letter-spacing: 1px;
         }
-        .btn-next:active { transform: scale(0.98); }
 
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: #050505; }
@@ -237,20 +236,20 @@
             <div>
                 <div class="br-logo">B/R NFL DRAFT SHOW</div>
                 <div id="apiIndicator" class="api-status">
-                    <div class="status-text">ESPN API: CONNECTING...</div>
-                    <div id="lastSyncTime" class="last-check">Authenticating...</div>
+                    <div class="status-text">ESPN CORE: CONNECTING...</div>
+                    <div id="lastSyncTime" class="last-check">Extension required...</div>
                 </div>
             </div>
-            <div class="live-tag">LIVE</div>
+            <div id="liveTag" class="api-status" style="color:#ff4444; font-weight:bold;">LIVE SYNC</div>
         </div>
 
         <div class="main-pick">
-            <div style="font-size: 12px; letter-spacing: 4px; color: #666; margin-bottom: 5px;">ON THE CLOCK</div>
-            <h1 class="pick-number" id="pickDisplay">204</h1>
+            <div class="label">ON THE CLOCK</div>
+            <h1 class="pick-number" id="pickDisplay">---</h1>
         </div>
 
         <div class="stats-bar">
-            <div class="stat-item"><div class="stat-value" id="countDisplay">53</div><div class="stat-label">Picks Left</div></div>
+            <div class="stat-item"><div class="stat-value" id="countDisplay">0</div><div class="stat-label">Picks Left</div></div>
             <div class="stat-item"><div class="stat-value" id="timerDisplay">00:00:00</div><div class="stat-label">Est. Time</div></div>
             <div class="stat-item"><div class="stat-value">257</div><div class="stat-label">Final Pick</div></div>
         </div>
@@ -260,8 +259,8 @@
                 <svg viewBox="0 0 24 24" fill="#333" width="30"><path d="M12 2L2 7v10l10 5 10-5V7L12 2z"/></svg>
             </div>
             <div class="player-info">
-                <p class="player-name" id="latestName">Syncing Board...</p>
-                <p class="player-detail" id="latestDetail">Fetching latest data</p>
+                <p class="player-name" id="latestName">Waiting for signal...</p>
+                <p class="player-detail" id="latestDetail">Direct API Sync</p>
             </div>
         </div>
 
@@ -279,38 +278,27 @@
             </table>
         </div>
 
-        <div class="controls">
-            <button class="btn-next" id="mainBtn" onclick="submitPick()">Submit Pick 204</button>
-            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                <button style="flex: 1; background: transparent; color: #444; border: 1px solid #222; font-size: 10px; padding: 6px; cursor: pointer; border-radius: 4px;" onclick="resetTo204()">Reset Tracker</button>
-            </div>
+        <div class="footer">
+            ESPN CORE API V2 | FULL AUTOMATION
         </div>
     </div>
 
     <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore-compat.js"></script>
 
     <script>
-        const config = {
-            apiKey: "AIzaSyDecV3qGqmwD6T7B2TAHfb3FT5jegIWBLk",
-            authDomain: "drafttracker-b6720.firebaseapp.com",
-            projectId: "drafttracker-b6720",
-            storageBucket: "drafttracker-b6720.firebasestorage.app",
-            messagingSenderId: "745753068393",
-            appId: "1:745753068393:web:5188024ae9abc9bd3573f8"
-        };
-
-        firebase.initializeApp(config);
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'br-draft-show-v2';
+        firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
-        const appId = config.projectId;
         const draftPath = `artifacts/${appId}/public/data/draftState/current`;
 
-        let currentPick = 204;
+        let currentPickNum = 0;
         let pickHistory = [];
-        let cache = { athletes: {}, teams: {} };
+        const apiCache = new Map();
 
         function format(s) {
             if (s <= 0) return "00:00:00";
@@ -321,20 +309,21 @@
         }
 
         function updateUI() {
-            document.getElementById('pickDisplay').innerText = currentPick;
-            document.getElementById('countDisplay').innerText = Math.max(0, 257 - currentPick);
-            document.getElementById('mainBtn').innerText = currentPick > 257 ? "DRAFT COMPLETE" : `Submit Pick ${currentPick}`;
+            if (currentPickNum === 0) return;
+            
+            document.getElementById('pickDisplay').innerText = currentPickNum;
+            document.getElementById('countDisplay').innerText = Math.max(0, 257 - currentPickNum);
             
             let countdownSec = 0;
-            for (let i = currentPick; i <= 257; i++) {
+            for (let i = currentPickNum; i <= 257; i++) {
                 countdownSec += (i >= 217) ? 139 : 174;
             }
             document.getElementById('timerDisplay').innerText = format(countdownSec);
 
             if (pickHistory.length > 0) {
                 const latest = pickHistory[0];
-                document.getElementById('latestName').innerText = latest.player || "Syncing...";
-                document.getElementById('latestDetail').innerText = `${latest.pos || "-"} | ${latest.school || "-"}`;
+                document.getElementById('latestName').innerText = latest.player;
+                document.getElementById('latestDetail').innerText = `${latest.pos} | ${latest.school}`;
                 if (latest.logo) {
                     document.getElementById('latestLogo').innerHTML = `<img src="${latest.logo}" alt="team">`;
                 }
@@ -342,14 +331,13 @@
             
             const tbody = document.getElementById('draftBoardBody');
             tbody.innerHTML = '';
-            // Display exactly the last 10 picks
             pickHistory.slice(0, 10).forEach(pick => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td class="td-pick">${pick.number}</td>
                     <td class="td-team">${pick.logo ? `<img src="${pick.logo}" alt="">` : ''}</td>
                     <td>
-                        <div class="td-player">${pick.player || "Drafting..."}</div>
+                        <div class="td-player">${pick.player || "Selection"}</div>
                         <div class="td-school">${pick.pos || ""} ${pick.school ? "| " + pick.school : ""}</div>
                     </td>
                 `;
@@ -357,150 +345,126 @@
             });
         }
 
-        async function submitPick() {
-            if (currentPick <= 257) {
-                currentPick++;
-                updateUI();
-                if (!auth.currentUser) await auth.signInAnonymously();
-                await db.doc(draftPath).set({ currentPick, lastUpdated: Date.now() }, { merge: true });
-                fetchEspnDraft();
-            }
-        }
-
-        // --- ENHANCED RESILIENT PROXY ROTATION ---
-        async function fetchWithProxy(url) {
+        // Direct fetch with https forcing
+        async function fetchDirect(url) {
             const secureUrl = url.replace('http://', 'https://');
-            const encodedUrl = encodeURIComponent(secureUrl);
-            
-            // Proxy Array: [Service URL Template, Result Parser Function]
-            const proxies = [
-                [`https://corsproxy.io/?${encodedUrl}`, r => r.json()],
-                [`https://api.allorigins.win/get?url=${encodedUrl}&t=${Date.now()}`, async r => JSON.parse((await r.json()).contents)],
-                [`https://api.codetabs.com/v1/proxy?quest=${encodedUrl}`, r => r.json()]
-            ];
-
-            for (let [template, parser] of proxies) {
-                try {
-                    const response = await fetch(template, { cache: "no-store" });
-                    if (response.ok) {
-                        return await parser(response);
-                    }
-                } catch (e) {
-                    console.warn(`Proxy ${template.split('/')[2]} failed, trying next...`);
-                }
-            }
-            throw new Error("All proxies failed");
+            const res = await fetch(secureUrl);
+            if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+            return await res.json();
         }
 
-        async function getDetail(url, cacheType) {
+        async function resolveDetail(url) {
             if (!url) return null;
-            if (cache[cacheType][url]) return cache[cacheType][url];
+            if (apiCache.has(url)) return apiCache.get(url);
             try {
-                const data = await fetchWithProxy(url);
-                if (data) {
-                    cache[cacheType][url] = data;
-                    return data;
-                }
+                const data = await fetchDirect(url);
+                apiCache.set(url, data);
+                return data;
             } catch (e) { return null; }
-            return null;
         }
 
-        async function fetchEspnDraft() {
+        async function syncEspn() {
             const apiIndicator = document.getElementById('apiIndicator');
             const statusText = apiIndicator.querySelector('.status-text');
             const syncTimeText = document.getElementById('lastSyncTime');
 
             try {
-                // Core API Picks Endpoint
-                const picksUrl = 'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/draft/picks?limit=257';
-                const picksData = await fetchWithProxy(picksUrl);
+                // 1. Get Rounds
+                const roundsUrl = 'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/draft/rounds?lang=en&region=us';
+                const roundsData = await fetchDirect(roundsUrl);
                 
-                if (picksData && picksData.items) {
-                    // Filter completed picks and sort newest first
-                    const completedPicks = picksData.items
-                        .filter(p => p.athlete)
-                        .sort((a, b) => b.number - a.number)
-                        .slice(0, 10);
+                if (roundsData && roundsData.items) {
+                    let allRawPicks = [];
+                    let onClockPickNum = null;
 
-                    // Resolve details for each pick
-                    const resolvedHistory = await Promise.all(completedPicks.map(async p => {
-                        const athlete = await getDetail(p.athlete.$ref, 'athletes');
-                        const team = await getDetail(p.team.$ref, 'teams');
-                        
-                        return {
-                            number: p.number,
-                            player: athlete ? athlete.displayName : "Unknown",
-                            pos: (athlete && athlete.position) ? athlete.position.abbreviation : "",
-                            school: (athlete && athlete.collegeAthlete && athlete.collegeAthlete.school) ? athlete.collegeAthlete.school.name : "",
-                            logo: (team && team.logos) ? team.logos[0].href : null
-                        };
-                    }));
+                    // 2. Fetch picks for most recent rounds (backwards)
+                    for (let i = roundsData.items.length - 1; i >= 0; i--) {
+                        try {
+                            const picksData = await fetchDirect(roundsData.items[i].picks.$ref);
+                            if (picksData && picksData.items) {
+                                allRawPicks = allRawPicks.concat(picksData.items);
+                                // On The Clock status = 1
+                                const clock = picksData.items.find(p => p.status && p.status.id === 1);
+                                if (clock && !onClockPickNum) onClockPickNum = clock.overall;
+                            }
+                            // Stop once we have enough data
+                            if (allRawPicks.filter(p => p.status && p.status.id === 3).length >= 10) break;
+                        } catch(e) { continue; }
+                    }
+
+                    // 3. Resolve detail for completed picks
+                    const completed = allRawPicks.filter(p => p.status && p.status.id === 3).sort((a, b) => b.overall - a.overall);
+                    const latestTen = completed.slice(0, 10);
+
+                    const resolvedHistory = [];
+                    for (const p of latestTen) {
+                        try {
+                            const athlete = await resolveDetail(p.athlete.$ref);
+                            const team = await resolveDetail(p.team.$ref);
+                            resolvedHistory.push({
+                                number: p.overall,
+                                player: athlete ? athlete.displayName : "Selection Made",
+                                pos: (athlete && athlete.position) ? athlete.position.abbreviation : "TBD",
+                                school: (athlete && athlete.college) ? (athlete.college.displayName || "College") : "N/A",
+                                logo: (team && team.logos) ? team.logos[0].href : null
+                            });
+                        } catch(e) {
+                            resolvedHistory.push({ number: p.overall, player: "Syncing...", pos: "TBD", school: "", logo: null });
+                        }
+                    }
 
                     if (resolvedHistory.length > 0) {
                         pickHistory = resolvedHistory;
-                        const latestMade = pickHistory[0].number;
-                        
-                        if (latestMade + 1 > currentPick) {
-                            currentPick = latestMade + 1;
-                            syncWithFirebase();
+                        const latestMade = resolvedHistory[0].number;
+                        const nextPick = onClockPickNum || (latestMade + 1);
+
+                        if (nextPick > currentPickNum) {
+                            currentPickNum = nextPick;
+                            if (auth.currentUser) {
+                                await db.doc(draftPath).set({ 
+                                    currentPick: currentPickNum, 
+                                    history: pickHistory, 
+                                    lastSync: Date.now() 
+                                }, { merge: true });
+                            }
                         }
                     }
 
                     const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                    syncTimeText.innerText = `Last Sync: ${now}`;
-                    statusText.innerText = "ESPN API: LIVE";
+                    syncTimeText.innerText = `Sync: ${now}`;
+                    statusText.innerText = "ESPN CORE: ACTIVE";
                     apiIndicator.className = 'api-status active';
                     updateUI();
                 }
             } catch (e) {
-                console.error("Critical Fetch Error", e);
-                statusText.innerText = "ESPN API: OFFLINE";
+                console.error("Direct fetch error", e);
+                statusText.innerText = "ESPN CORE: ERROR (CORS?)";
                 apiIndicator.className = 'api-status error';
-                syncTimeText.innerText = "Check your connection";
+                syncTimeText.innerText = "Enable CORS extension and refresh";
             }
         }
 
-        async function syncWithFirebase() {
-            if (!auth.currentUser) await auth.signInAnonymously();
-            await db.doc(draftPath).set({ 
-                currentPick, 
-                history: pickHistory.slice(0, 15),
-                lastUpdated: Date.now() 
-            }, { merge: true });
-        }
-
-        // Initialize and Set Polling
-        setInterval(fetchEspnDraft, 45000); // 45s interval to ensure we don't spam proxies
-        fetchEspnDraft();
-
-        async function resetTo204() {
-            if (confirm("Reset to Pick 204?")) {
-                currentPick = 204;
-                pickHistory = [];
-                updateUI();
-                if (!auth.currentUser) await auth.signInAnonymously();
-                await db.doc(draftPath).set({ currentPick: 204, history: [] }, { merge: true });
+        async function initFirebaseSync() {
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await auth.signInWithCustomToken(__initial_auth_token);
+            } else {
+                await auth.signInAnonymously();
             }
-        }
 
-        async function startSync() {
-            if (!auth.currentUser) await auth.signInAnonymously();
             db.doc(draftPath).onSnapshot(doc => {
                 if (doc.exists) {
                     const data = doc.data();
-                    if (data.currentPick && data.currentPick > currentPick) {
-                        currentPick = data.currentPick;
-                    }
-                    if (data.history && (!pickHistory.length || data.history[0].number > pickHistory[0].number)) {
-                        pickHistory = data.history;
-                    }
+                    if (data.currentPick > currentPickNum) currentPickNum = data.currentPick;
+                    if (data.history) pickHistory = data.history;
                     updateUI();
                 }
-            }, err => console.error("Firebase Snapshot Error", err));
+            }, err => console.error("Firebase Error", err));
         }
 
-        updateUI();
-        startSync();
+        initFirebaseSync();
+        // Polling set to 25s
+        setInterval(syncEspn, 25000); 
+        syncEspn();
     </script>
 </body>
 </html>
