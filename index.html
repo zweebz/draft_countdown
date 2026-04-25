@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B/R LIVE | NFL Draft Tracker</title>
+    <title>B/R LIVE | 2026 NFL Draft Tracker</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Roboto+Condensed:wght@400;700&display=swap');
 
@@ -35,6 +35,9 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.9);
             overflow: hidden;
             border: 1px solid #222;
+            display: flex;
+            flex-direction: column;
+            height: 95vh;
         }
 
         .container::before {
@@ -55,11 +58,12 @@
 
         .header {
             background-color: var(--br-black);
-            padding: 20px 15px;
+            padding: 15px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             border-bottom: 1px solid var(--br-light-grey);
+            flex-shrink: 0;
         }
 
         .br-logo {
@@ -73,37 +77,31 @@
             -webkit-text-fill-color: transparent;
         }
 
-        .live-tag {
-            color: #fff;
-            font-size: 11px;
-            font-weight: bold;
-            background: rgba(255,255,255,0.05);
-            padding: 4px 10px;
-            border-radius: 4px;
+        .api-status {
+            font-size: 9px;
+            color: #444;
+            letter-spacing: 1px;
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
         }
 
-        .live-tag::before {
-            content: "";
-            width: 8px; height: 8px;
-            background: #ff4444;
-            border-radius: 50%;
-            margin-right: 8px;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+        .status-text { display: flex; align-items: center; gap: 5px; }
+        .api-status.active .status-text { color: #B5EAD7; }
+        .api-status.error .status-text { color: #FFB7B2; }
+        .last-check { font-size: 8px; color: #666; text-transform: none; }
 
         .main-pick {
-            padding: 40px 20px;
+            padding: 30px 20px;
             text-align: center;
             background: radial-gradient(circle at center, #222 0%, #0a0a0a 100%);
+            flex-shrink: 0;
         }
 
         .pick-number {
             font-family: 'Oswald', sans-serif;
-            font-size: 120px;
+            font-size: 100px;
             line-height: 1;
             font-weight: 700;
             margin: 0;
@@ -114,9 +112,10 @@
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             background-color: var(--br-black);
-            padding: 20px 0;
+            padding: 15px 0;
             border-top: 1px solid #222;
             border-bottom: 1px solid #222;
+            flex-shrink: 0;
         }
 
         .stat-item { text-align: center; border-right: 1px solid #222; }
@@ -124,7 +123,7 @@
 
         .stat-value {
             font-family: 'Oswald', sans-serif;
-            font-size: 22px;
+            font-size: 20px;
             background: var(--br-rainbow);
             background-size: 300% auto;
             animation: shimmer 3s linear infinite;
@@ -134,7 +133,67 @@
 
         .stat-label { font-size: 9px; color: #666; letter-spacing: 1px; margin-top: 4px; }
 
-        .controls { padding: 30px; background-color: var(--br-grey); }
+        .latest-selection {
+            background-color: #000;
+            margin: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .latest-selection::after {
+            content: "LATEST PICK";
+            position: absolute;
+            top: -8px;
+            left: 15px;
+            background: var(--br-rainbow);
+            background-size: 300% auto;
+            animation: shimmer 3s linear infinite;
+            color: #000;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .team-logo {
+            width: 50px; height: 50px;
+            background: #111; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            padding: 5px;
+        }
+        .team-logo img { width: 100%; height: auto; }
+
+        .player-info { text-align: left; }
+        .player-name { font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700; color: #fff; margin: 0; }
+        .player-detail { font-size: 11px; color: #888; margin: 0; }
+
+        .history-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            background: #050505;
+            border-top: 1px solid #222;
+        }
+
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th {
+            position: sticky; top: 0; background: #111;
+            padding: 10px; text-align: left; color: #555;
+            font-size: 10px; z-index: 5;
+        }
+        td { padding: 12px 10px; border-bottom: 1px solid #111; color: #ccc; }
+        .td-pick { font-family: 'Oswald', sans-serif; color: #666; width: 40px; }
+        .td-team { width: 40px; text-align: center; }
+        .td-team img { width: 20px; height: auto; opacity: 0.8; }
+        .td-player { font-weight: 700; color: #eee; }
+        .td-school { color: #666; font-size: 10px; }
+
+        .controls { padding: 20px; background-color: var(--br-grey); flex-shrink: 0; }
 
         .btn-next {
             background: var(--br-rainbow);
@@ -142,11 +201,11 @@
             animation: shimmer 3s linear infinite;
             color: #000;
             font-family: 'Oswald', sans-serif;
-            font-size: 22px;
+            font-size: 18px;
             font-weight: 700;
             border-radius: 4px;
-            padding: 18px;
-            margin-bottom: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
             cursor: pointer;
             border: none;
             width: 100%;
@@ -154,23 +213,23 @@
 
         .nap-tracker {
             background: #000;
-            padding: 20px 25px;
+            padding: 15px 25px;
             border-top: 1px solid #222;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0;
         }
 
-        .nap-time { font-family: 'Oswald', sans-serif; font-size: 28px; color: #C7CEEA; }
+        .nap-time { font-family: 'Oswald', sans-serif; font-size: 24px; color: #C7CEEA; }
 
         .nap-controls { display: flex; gap: 10px; }
         .nap-controls button {
-            width: 44px; height: 44px; font-size: 18px;
+            width: 36px; height: 36px; font-size: 16px;
             background: #1a1a1a; color: #fff;
             border: 1px solid #333; border-radius: 8px;
             cursor: pointer;
         }
-
         .nap-controls button.active {
             background: var(--br-rainbow);
             background-size: 300% auto;
@@ -178,19 +237,27 @@
             color: #000; border: none;
         }
 
-        .history { padding: 15px; max-height: 100px; overflow-y: auto; background: #050505; font-size: 12px; color: #444; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #050505; }
+        ::-webkit-scrollbar-thumb { background: #222; border-radius: 5px; }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div class="header">
-            <div class="br-logo">B/R NFL DRAFT SHOW</div>
+            <div>
+                <div class="br-logo">B/R NFL DRAFT SHOW</div>
+                <div id="apiIndicator" class="api-status">
+                    <div class="status-text">ESPN API: CONNECTING...</div>
+                    <div id="lastSyncTime" class="last-check">Bypassing CORS...</div>
+                </div>
+            </div>
             <div class="live-tag">LIVE</div>
         </div>
 
         <div class="main-pick">
-            <div style="font-size: 18px; letter-spacing: 3px; color: #888; margin-bottom: 5px;">ON THE CLOCK</div>
+            <div style="font-size: 14px; letter-spacing: 3px; color: #888; margin-bottom: 5px;">ON THE CLOCK</div>
             <h1 class="pick-number" id="pickDisplay">204</h1>
         </div>
 
@@ -200,14 +267,39 @@
             <div class="stat-item"><div class="stat-value">257</div><div class="stat-label">Final Pick</div></div>
         </div>
 
+        <div class="latest-selection" id="latestCard">
+            <div class="team-logo" id="latestLogo">
+                <svg viewBox="0 0 24 24" fill="#333" width="30"><path d="M12 2L2 7v10l10 5 10-5V7L12 2z"/></svg>
+            </div>
+            <div class="player-info">
+                <p class="player-name" id="latestName">Waiting for pick...</p>
+                <p class="player-detail" id="latestDetail">Details will appear here</p>
+            </div>
+        </div>
+
+        <div class="history-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="td-pick">PK</th>
+                        <th class="td-team">TM</th>
+                        <th>PLAYER / SCHOOL</th>
+                    </tr>
+                </thead>
+                <tbody id="draftBoardBody">
+                    <!-- Picks populate here -->
+                </tbody>
+            </table>
+        </div>
+
         <div class="controls">
             <button class="btn-next" id="mainBtn" onclick="submitPick()">Submit Pick 204</button>
-            <button style="background: transparent; color: #444; border: 1px solid #222; font-size: 12px; padding: 10px; cursor: pointer; width: 100%;" onclick="resetTo204()">Hard Reset to 204</button>
+            <button style="background: transparent; color: #444; border: 1px solid #222; font-size: 11px; padding: 8px; cursor: pointer; width: 100%; border-radius: 4px;" onclick="resetTo204()">Hard Reset Tracker</button>
         </div>
 
         <div class="nap-tracker">
             <div>
-                <div style="font-size: 10px; color: #555; font-weight: bold;">RED'S NAP TIMER</div>
+                <div style="font-size: 9px; color: #555; font-weight: bold; letter-spacing: 1px;">RED'S NAP TIMER</div>
                 <div class="nap-time" id="napDisplay">00:00:00</div>
             </div>
             <div class="nap-controls">
@@ -216,8 +308,6 @@
                 <button onclick="resetNap()">↺</button>
             </div>
         </div>
-
-        <div class="history" id="log"></div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-app-compat.js"></script>
@@ -244,6 +334,7 @@
         let napSeconds = 0;
         let napActive = false;
         let countdownSec = 0;
+        let pickHistory = [];
 
         function format(s) {
             if (s <= 0) return "00:00:00";
@@ -257,10 +348,36 @@
             document.getElementById('pickDisplay').innerText = currentPick;
             document.getElementById('countDisplay').innerText = Math.max(0, 257 - currentPick);
             document.getElementById('mainBtn').innerText = currentPick > 257 ? "DRAFT COMPLETE" : `Submit Pick ${currentPick}`;
+            
             countdownSec = 0;
             for (let i = currentPick; i <= 257; i++) {
                 countdownSec += (i >= 217) ? 139 : 174;
             }
+            document.getElementById('timerDisplay').innerText = format(countdownSec);
+
+            if (pickHistory.length > 0) {
+                const latest = pickHistory[0];
+                document.getElementById('latestName').innerText = latest.player || "Selected";
+                document.getElementById('latestDetail').innerText = `${latest.pos || "POS"} | ${latest.school || "School"}`;
+                if (latest.logo) {
+                    document.getElementById('latestLogo').innerHTML = `<img src="${latest.logo}" alt="team">`;
+                }
+            }
+            
+            const tbody = document.getElementById('draftBoardBody');
+            tbody.innerHTML = '';
+            pickHistory.forEach(pick => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="td-pick">${pick.number}</td>
+                    <td class="td-team">${pick.logo ? `<img src="${pick.logo}" alt="">` : '-'}</td>
+                    <td>
+                        <div class="td-player">${pick.player}</div>
+                        <div class="td-school">${pick.pos} | ${pick.school}</div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
         }
 
         async function submitPick() {
@@ -269,19 +386,80 @@
                 updateUI();
                 if (!auth.currentUser) await auth.signInAnonymously();
                 await db.doc(draftPath).set({ currentPick, lastUpdated: Date.now() }, { merge: true });
+                fetchEspnDraft();
             }
         }
+
+        // --- ESPN API PROXY FETCH ---
+        async function fetchEspnDraft() {
+            const apiIndicator = document.getElementById('apiIndicator');
+            const statusText = apiIndicator.querySelector('.status-text');
+            const syncTimeText = document.getElementById('lastSyncTime');
+
+            try {
+                // Use AllOrigins proxy to bypass CORS
+                const targetUrl = encodeURIComponent('https://site.api.espn.com/apis/site/v2/sports/football/nfl/draft/board');
+                const response = await fetch(`https://api.allorigins.win/get?url=${targetUrl}`);
+                
+                if (!response.ok) throw new Error('Proxy failed');
+                
+                const wrapper = await response.json();
+                const data = JSON.parse(wrapper.contents); // The proxy returns data in a 'contents' string
+                
+                const now = new Date().toLocaleTimeString();
+                syncTimeText.innerText = `Synced at ${now}`;
+
+                if (data && data.draft && data.draft.picks) {
+                    const allPicks = data.draft.picks;
+                    const madePicks = allPicks.filter(p => p.player);
+                    
+                    pickHistory = madePicks.map(p => ({
+                        number: p.overall,
+                        player: p.player.displayName,
+                        pos: p.player.position,
+                        school: p.player.school,
+                        logo: p.team ? p.team.logo : null,
+                        team: p.team ? p.team.displayName : 'TBD'
+                    })).sort((a, b) => b.number - a.number);
+
+                    const latestPickNumMade = pickHistory.length > 0 ? pickHistory[0].number : 0;
+                    const latestPickOnClock = latestPickNumMade + 1;
+                    
+                    if (latestPickOnClock > currentPick) {
+                        currentPick = latestPickOnClock;
+                        if (!auth.currentUser) await auth.signInAnonymously();
+                        await db.doc(draftPath).set({ 
+                            currentPick, 
+                            history: pickHistory.slice(0, 15), 
+                            lastUpdated: Date.now() 
+                        }, { merge: true });
+                    }
+                    
+                    statusText.innerText = "ESPN API: LIVE";
+                    apiIndicator.className = 'api-status active';
+                    updateUI();
+                }
+            } catch (error) {
+                console.error("Proxy Fetch Error:", error);
+                statusText.innerText = "ESPN API: SYNC ERROR";
+                syncTimeText.innerText = "Fallback to manual updates";
+                apiIndicator.className = 'api-status error';
+            }
+        }
+
+        setInterval(fetchEspnDraft, 20000);
+        fetchEspnDraft();
 
         async function resetTo204() {
-            if (confirm("Reset to 204?")) {
+            if (confirm("Reset to Pick 204?")) {
                 currentPick = 204;
+                pickHistory = [];
                 updateUI();
                 if (!auth.currentUser) await auth.signInAnonymously();
-                await db.doc(draftPath).set({ currentPick: 204 }, { merge: true });
+                await db.doc(draftPath).set({ currentPick: 204, history: [] }, { merge: true });
             }
         }
 
-        // Nap Tracker
         function updateNapUI() {
             document.getElementById('napDisplay').innerText = format(napSeconds);
             document.getElementById('napPlay').className = napActive ? 'active' : '';
@@ -317,14 +495,20 @@
             
             db.doc(draftPath).onSnapshot(doc => {
                 if (doc.exists) {
-                    const serverPick = doc.data().currentPick;
-                    // Fix: Only sync if the server's number is actually further ahead
-                    if (serverPick && serverPick > currentPick) {
-                        currentPick = serverPick;
-                        updateUI();
+                    const data = doc.data();
+                    if (data.currentPick && data.currentPick > currentPick) {
+                        currentPick = data.currentPick;
                     }
+                    if (data.history) {
+                        const merged = [...data.history, ...pickHistory];
+                        const unique = Array.from(new Set(merged.map(a => a.number)))
+                            .map(num => merged.find(a => a.number === num))
+                            .sort((a, b) => b.number - a.number);
+                        pickHistory = unique;
+                    }
+                    updateUI();
                 }
-            });
+            }, err => console.error("Sync Error:", err));
 
             db.doc(napPath).onSnapshot(doc => {
                 if (doc.exists) {
