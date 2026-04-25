@@ -365,14 +365,35 @@
             }
         }
 
-        // --- CORE API SYNC ---
+        // --- IMPROVED RESILIENT API PROXY ---
         async function fetchWithProxy(url) {
-            const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`);
-            if (!response.ok) throw new Error();
-            return await response.json();
+            // Force HTTPS for Core API
+            const secureUrl = url.replace('http://', 'https://');
+            
+            // Try Proxy 1: AllOrigins
+            try {
+                const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(secureUrl)}&t=${Date.now()}`);
+                if (res.ok) {
+                    const json = await res.json();
+                    return JSON.parse(json.contents);
+                }
+            } catch (e) {
+                console.warn("AllOrigins failed, trying CorsProxy.io...");
+            }
+
+            // Try Proxy 2: CorsProxy.io
+            try {
+                const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(secureUrl)}`);
+                if (res.ok) return await res.json();
+            } catch (e) {
+                console.error("CorsProxy also failed.");
+            }
+
+            throw new Error("Failed to fetch via all proxies");
         }
 
         async function getDetail(url, cacheType) {
+            if (!url) return null;
             if (cache[cacheType][url]) return cache[cacheType][url];
             try {
                 const data = await fetchWithProxy(url);
@@ -387,13 +408,14 @@
             const syncTimeText = document.getElementById('lastSyncTime');
 
             try {
-                // Correct Core API URL provided by user
+                // Correct Core API URL (forced HTTPS for security)
                 const picksUrl = 'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/draft/picks?limit=257';
                 const picksData = await fetchWithProxy(picksUrl);
                 
                 if (picksData && picksData.items) {
                     const sortedPicks = picksData.items.sort((a, b) => b.number - a.number);
-                    const rawHistory = sortedPicks.filter(p => p.athlete).slice(0, 15);
+                    // Filter for picks that actually have an athlete (are completed)
+                    const rawHistory = sortedPicks.filter(p => p.athlete).slice(0, 10);
 
                     const resolvedHistory = await Promise.all(rawHistory.map(async p => {
                         const athlete = await getDetail(p.athlete.$ref, 'athletes');
@@ -402,17 +424,19 @@
                             number: p.number,
                             player: athlete ? athlete.displayName : "Unknown",
                             pos: athlete && athlete.position ? athlete.position.abbreviation : "",
-                            school: athlete && athlete.collegeAthlete ? athlete.collegeAthlete.school.name : "",
+                            school: athlete && athlete.collegeAthlete ? athlete.collegeAthlete.school.name : (athlete && athlete.college ? athlete.college.name : ""),
                             logo: team && team.logos ? team.logos[0].href : null
                         };
                     }));
 
-                    pickHistory = resolvedHistory;
-                    const latestMade = pickHistory.length > 0 ? pickHistory[0].number : 0;
-                    
-                    if (latestMade + 1 > currentPick) {
-                        currentPick = latestMade + 1;
-                        syncWithFirebase();
+                    if (resolvedHistory.length > 0) {
+                        pickHistory = resolvedHistory;
+                        const latestMade = pickHistory[0].number;
+                        
+                        if (latestMade + 1 > currentPick) {
+                            currentPick = latestMade + 1;
+                            syncWithFirebase();
+                        }
                     }
 
                     const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -423,7 +447,7 @@
                 }
             } catch (e) {
                 console.error("Fetch Error", e);
-                statusText.innerText = "ESPN API: ERROR";
+                statusText.innerText = "ESPN API: ERR/OFFLINE";
                 apiIndicator.className = 'api-status error';
             }
         }
@@ -437,7 +461,7 @@
             }, { merge: true });
         }
 
-        setInterval(fetchEspnDraft, 20000);
+        setInterval(fetchEspnDraft, 30000); // 30s interval to prevent proxy rate limiting
         fetchEspnDraft();
 
         async function resetTo204() {
