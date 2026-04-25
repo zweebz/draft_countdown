@@ -25,7 +25,6 @@
             align-items: center;
             min-height: 100vh;
             text-transform: uppercase;
-            overflow-x: hidden;
         }
 
         .container {
@@ -38,7 +37,6 @@
             border: 1px solid #222;
         }
 
-        /* Active RGB Shimmer Border */
         .container::before {
             content: "";
             position: absolute;
@@ -68,7 +66,6 @@
             font-family: 'Oswald', sans-serif;
             font-weight: 700;
             font-size: 18px;
-            letter-spacing: -0.5px;
             background: var(--br-rainbow);
             background-size: 300% auto;
             animation: shimmer 3s linear infinite;
@@ -80,7 +77,6 @@
             color: #fff;
             font-size: 11px;
             font-weight: bold;
-            letter-spacing: 1px;
             background: rgba(255,255,255,0.05);
             padding: 4px 10px;
             border-radius: 4px;
@@ -91,11 +87,10 @@
         .live-tag::before {
             content: "";
             width: 8px; height: 8px;
-            background: var(--br-rainbow);
-            background-size: 300% auto;
-            animation: shimmer 3s linear infinite, pulse 1.5s infinite;
+            background: #ff4444;
             border-radius: 50%;
             margin-right: 8px;
+            animation: pulse 1.5s infinite;
         }
 
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
@@ -104,18 +99,6 @@
             padding: 40px 20px;
             text-align: center;
             background: radial-gradient(circle at center, #222 0%, #0a0a0a 100%);
-        }
-
-        .label {
-            font-family: 'Oswald', sans-serif;
-            font-size: 18px;
-            letter-spacing: 3px;
-            background: var(--br-rainbow);
-            background-size: 300% auto;
-            animation: shimmer 3s linear infinite;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 5px;
         }
 
         .pick-number {
@@ -169,11 +152,6 @@
             width: 100%;
         }
 
-        .btn-next:hover { filter: brightness(1.2); transform: translateY(-2px); }
-        .btn-next:disabled { opacity: 0.5; cursor: not-allowed; }
-
-        .btn-reset { background: transparent; color: #444; border: 1px solid #222; font-size: 12px; padding: 10px; cursor: pointer; width: 100%; border-radius: 4px; }
-
         .nap-tracker {
             background: #000;
             padding: 20px 25px;
@@ -200,62 +178,48 @@
             color: #000; border: none;
         }
 
-        .history { padding: 15px; max-height: 100px; overflow-y: auto; background: #050505; font-size: 12px; color: #444; border-top: 1px solid #222; }
-        .history-item { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #111; }
-
-        #errorOverlay {
-            display: none;
-            background: #ff4444; color: #fff;
-            padding: 10px; text-align: center; font-size: 12px;
-            text-transform: none;
-        }
-        #errorOverlay a { color: #fff; font-weight: bold; }
+        .history { padding: 15px; max-height: 100px; overflow-y: auto; background: #050505; font-size: 12px; color: #444; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <div id="errorOverlay">
-            <b>Database Offline:</b> Please <a id="fixLink" href="#" target="_blank">Enable Firestore</a> to sync with your team.
-        </div>
-
         <div class="header">
             <div class="br-logo">B/R NFL DRAFT SHOW</div>
             <div class="live-tag">LIVE</div>
         </div>
 
         <div class="main-pick">
-            <div class="label" id="statusLabel">On The Clock</div>
-            <h1 class="pick-number" id="pickDisplay">185</h1>
+            <div style="font-size: 18px; letter-spacing: 3px; color: #888; margin-bottom: 5px;">ON THE CLOCK</div>
+            <h1 class="pick-number" id="pickDisplay">204</h1>
         </div>
 
         <div class="stats-bar">
-            <div class="stat-item"><div class="stat-value" id="countDisplay">72</div><div class="stat-label">Picks Left</div></div>
+            <div class="stat-item"><div class="stat-value" id="countDisplay">53</div><div class="stat-label">Picks Left</div></div>
             <div class="stat-item"><div class="stat-value" id="timerDisplay">00:00:00</div><div class="stat-label">Est. Time</div></div>
             <div class="stat-item"><div class="stat-value">257</div><div class="stat-label">Final Pick</div></div>
         </div>
 
         <div class="controls">
-            <button class="btn-next" id="mainBtn" onclick="submitPick()">Submit Pick 185</button>
-            <button class="btn-reset" onclick="resetAll()">Reset Tracker to 185</button>
+            <button class="btn-next" id="mainBtn" onclick="submitPick()">Submit Pick 204</button>
+            <button style="background: transparent; color: #444; border: 1px solid #222; font-size: 12px; padding: 10px; cursor: pointer; width: 100%;" onclick="resetTo204()">Hard Reset to 204</button>
         </div>
 
         <div class="nap-tracker">
             <div>
-                <div style="font-size: 10px; color: #555; font-weight: bold; letter-spacing: 1px;">RED'S NAP TIMER</div>
+                <div style="font-size: 10px; color: #555; font-weight: bold;">RED'S NAP TIMER</div>
                 <div class="nap-time" id="napDisplay">00:00:00</div>
             </div>
             <div class="nap-controls">
-                <button id="napPlay" onclick="setNapActive(true)">▶</button>
-                <button id="napPause" onclick="setNapActive(false)">⏸</button>
+                <button id="napPlay" onclick="setNap(true)">▶</button>
+                <button id="napPause" onclick="setNap(false)">⏸</button>
                 <button onclick="resetNap()">↺</button>
             </div>
         </div>
 
-        <div class="history" id="log"><div style="padding: 10px; text-align: center;">Draft Progress Tracking...</div></div>
+        <div class="history" id="log"></div>
     </div>
 
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore-compat.js"></script>
@@ -270,24 +234,16 @@
             appId: "1:745753068393:web:5188024ae9abc9bd3573f8"
         };
 
-        // Init
         firebase.initializeApp(config);
         const db = firebase.firestore();
         const auth = firebase.auth();
-        const appId = config.projectId;
+        const draftPath = `artifacts/${config.projectId}/public/data/draftState/current`;
+        const napPath = `artifacts/${config.projectId}/public/data/napState/current`;
 
-        // Path following Rule 1 (6 segments: artifacts/id/public/data/collection/doc)
-        const draftDoc = `artifacts/${appId}/public/data/draftState/current`;
-        const napDoc = `artifacts/${appId}/public/data/napState/current`;
-
-        document.getElementById('fixLink').href = `https://console.firebase.google.com/project/${appId}/firestore`;
-
-        let currentPick = 185;
+        let currentPick = 204;
         let napSeconds = 0;
         let napActive = false;
         let countdownSec = 0;
-        let globalTimer = null;
-        let napTicker = null;
 
         function format(s) {
             if (s <= 0) return "00:00:00";
@@ -297,94 +253,54 @@
             return `${h}:${m}:${sec}`;
         }
 
-        // Calculation: R5/6 = 174s per pick. R7 (starts pick 217) = 139s per pick.
-        function getRemainingTime(pick) {
-            let total = 0;
-            for (let i = pick; i <= 257; i++) {
-                total += (i >= 217) ? 139 : 174;
-            }
-            return total;
-        }
-
         function updateUI() {
             document.getElementById('pickDisplay').innerText = currentPick;
             document.getElementById('countDisplay').innerText = Math.max(0, 257 - currentPick);
-            
-            const btn = document.getElementById('mainBtn');
-            const status = document.getElementById('statusLabel');
-
-            if (currentPick > 257) {
-                status.innerText = "DRAFT COMPLETE";
-                btn.innerText = "MR. IRRELEVANT SET";
-                btn.disabled = true;
-                countdownSec = 0;
-            } else {
-                status.innerText = "ON THE CLOCK";
-                btn.innerText = `Submit Pick ${currentPick}`;
-                btn.disabled = false;
-                countdownSec = getRemainingTime(currentPick);
-            }
-            document.getElementById('timerDisplay').innerText = format(countdownSec);
-        }
-
-        function addToLog(msg) {
-            const log = document.getElementById('log');
-            const div = document.createElement('div');
-            div.className = 'history-item';
-            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            div.innerHTML = `<span>${msg}</span><span>${time}</span>`;
-            log.prepend(div);
-        }
-
-        async function syncState(path, data) {
-            try {
-                if (!auth.currentUser) await auth.signInAnonymously();
-                await db.doc(path).set(data, { merge: true });
-            } catch (e) {
-                console.error("Sync error", e);
-                if (e.code === 'permission-denied') document.getElementById('errorOverlay').style.display = 'block';
+            document.getElementById('mainBtn').innerText = currentPick > 257 ? "DRAFT COMPLETE" : `Submit Pick ${currentPick}`;
+            countdownSec = 0;
+            for (let i = currentPick; i <= 257; i++) {
+                countdownSec += (i >= 217) ? 139 : 174;
             }
         }
 
-        function submitPick() {
+        async function submitPick() {
             if (currentPick <= 257) {
-                const pickJustMade = currentPick;
                 currentPick++;
-                updateUI(); // Local update first for speed
-                addToLog(`Pick ${pickJustMade} Processed`);
-                syncState(draftDoc, { currentPick, lastUpdated: firebase.firestore.Timestamp.now() });
+                updateUI();
+                if (!auth.currentUser) await auth.signInAnonymously();
+                await db.doc(draftPath).set({ currentPick, lastUpdated: Date.now() }, { merge: true });
             }
         }
 
-        async function resetAll() {
-            if (!confirm("Reset back to Pick 185?")) return;
-            currentPick = 185;
-            updateUI();
-            addToLog("Draft Reset to 185");
-            syncState(draftDoc, { currentPick });
+        async function resetTo204() {
+            if (confirm("Reset to 204?")) {
+                currentPick = 204;
+                updateUI();
+                if (!auth.currentUser) await auth.signInAnonymously();
+                await db.doc(draftPath).set({ currentPick: 204 }, { merge: true });
+            }
         }
 
         // Nap Tracker
         function updateNapUI() {
             document.getElementById('napDisplay').innerText = format(napSeconds);
             document.getElementById('napPlay').className = napActive ? 'active' : '';
-            document.getElementById('napPause').className = (!napActive && napSeconds > 0) ? 'active' : '';
         }
 
-        function setNapActive(active) {
+        async function setNap(active) {
             napActive = active;
             updateNapUI();
-            syncState(napDoc, { napActive, napSeconds });
+            if (!auth.currentUser) await auth.signInAnonymously();
+            await db.doc(napPath).set({ napActive, napSeconds }, { merge: true });
         }
 
-        function resetNap() {
-            napActive = false;
-            napSeconds = 0;
+        async function resetNap() {
+            napSeconds = 0; napActive = false;
             updateNapUI();
-            syncState(napDoc, { napActive, napSeconds });
+            if (!auth.currentUser) await auth.signInAnonymously();
+            await db.doc(napPath).set({ napActive, napSeconds }, { merge: true });
         }
 
-        // Tickers
         setInterval(() => {
             if (countdownSec > 0) {
                 countdownSec--;
@@ -396,25 +312,25 @@
             }
         }, 1000);
 
-        // Firestore Listeners
         async function startSync() {
             if (!auth.currentUser) await auth.signInAnonymously();
-
-            db.doc(draftDoc).onSnapshot(doc => {
+            
+            db.doc(draftPath).onSnapshot(doc => {
                 if (doc.exists) {
-                    const data = doc.data();
-                    if (data.currentPick && data.currentPick !== currentPick) {
-                        currentPick = data.currentPick;
+                    const serverPick = doc.data().currentPick;
+                    // Fix: Only sync if the server's number is actually further ahead
+                    if (serverPick && serverPick > currentPick) {
+                        currentPick = serverPick;
                         updateUI();
                     }
                 }
-            }, e => { if (e.code === 'permission-denied') document.getElementById('errorOverlay').style.display = 'block'; });
+            });
 
-            db.doc(napDoc).onSnapshot(doc => {
+            db.doc(napPath).onSnapshot(doc => {
                 if (doc.exists) {
                     const data = doc.data();
-                    napSeconds = data.napSeconds || 0;
-                    napActive = data.napActive || false;
+                    if (data.napSeconds > napSeconds) napSeconds = data.napSeconds;
+                    napActive = data.napActive;
                     updateNapUI();
                 }
             });
