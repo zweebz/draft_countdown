@@ -3,135 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 NFL Draft Tracker</title>
+    <title>2026 NFL Draft | Glassmorphism Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         
-        body { font-family: 'Inter', sans-serif; }
-
-        @keyframes pulse-red {
-            0%, 100% { background-color: rgba(220, 38, 38, 1); border-color: rgba(239, 68, 68, 1); }
-            50% { background-color: rgba(153, 27, 27, 1); border-color: rgba(220, 38, 38, 0.5); }
-        }
-        
-        .on-the-clock-pulse {
-            animation: pulse-red 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        :root {
+            --ios-blue: #007AFF;
+            --ios-red: #FF3B30;
+            --ios-indigo: #5856D6;
         }
 
-        .custom-scrollbar::-webkit-scrollbar { height: 4px; width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #000;
+            color: #fff;
+            overflow-x: hidden;
+            background-attachment: fixed;
+        }
 
-        .team-logo-shadow { filter: drop-shadow(0 0 8px rgba(0,0,0,0.5)); }
+        /* Glassmorphism Background Orbs */
+        .orb {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.12;
+            pointer-events: none;
+        }
+        .orb-blue { top: -150px; left: -150px; background: var(--ios-blue); animation: drift 20s infinite alternate; }
+        .orb-purple { bottom: -150px; right: -150px; background: var(--ios-indigo); animation: drift 25s infinite alternate-reverse; }
+
+        @keyframes drift {
+            from { transform: translate(0, 0) scale(1); }
+            to { transform: translate(50px, 30px) scale(1.05); }
+        }
+
+        /* Core Glass Class */
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(30px) saturate(180%);
+            -webkit-backdrop-filter: blur(30px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.6);
+        }
+
+        .glass-bright {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .ios-pill {
+            border-radius: 9999px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes pulse-ios-red {
+            0%, 100% { background: rgba(255, 59, 48, 0.08); border-color: rgba(255, 59, 48, 0.2); }
+            50% { background: rgba(255, 59, 48, 0.2); border-color: rgba(255, 59, 48, 0.4); }
+        }
         
-        .loading-shimmer {
-            background: linear-gradient(90deg, #0f172a 25%, #1e293b 50%, #0f172a 75%);
+        .on-the-clock-active {
+            animation: pulse-ios-red 2s ease-in-out infinite;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { height: 3px; width: 3px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
+
+        .btn-active {
+            background: var(--ios-blue);
+            box-shadow: 0 2px 10px rgba(0, 122, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .premium-shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.02), transparent);
             background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
+            animation: shimmer 2.5s infinite;
         }
+
         @keyframes shimmer {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        .table-row {
+            transition: all 0.3s ease;
+        }
+        .table-row:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+        
+        /* Helper to ensure team color glows don't overpower text */
+        .team-tint {
+            position: relative;
+        }
+        .team-tint::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--team-color, transparent);
+            opacity: 0.05;
+            z-index: -1;
+            pointer-events: none;
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen">
+<body class="min-h-screen">
 
-    <div id="app" class="max-w-6xl mx-auto px-4 py-6 md:py-10">
-        <!-- Header -->
-        <header class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 mb-10 border-b border-slate-800 pb-10">
+    <div class="orb orb-blue"></div>
+    <div class="orb orb-purple"></div>
+
+    <div id="app" class="max-w-5xl mx-auto px-4 py-8 relative z-10">
+        <!-- Status Bar -->
+        <div class="flex justify-between items-center mb-10 px-2">
+            <div class="flex items-center gap-2">
+                <div class="relative">
+                    <div class="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_10px_#007AFF]"></div>
+                    <div class="absolute inset-0 w-1.5 h-1.5 rounded-full bg-blue-500 animate-ping"></div>
+                </div>
+                <span class="text-[9px] font-bold tracking-[0.2em] text-white/40 uppercase italic">Ultra-Sync Realtime</span>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-2">
+                    <span class="text-[8px] font-black text-white/20 uppercase tracking-widest">Rate</span>
+                    <span class="text-[10px] font-bold text-green-400/60 tabular-nums">1.0s</span>
+                </div>
+                <div class="h-3 w-[1px] bg-white/10"></div>
+                <span id="update-timestamp" class="text-[10px] font-bold text-white/20 uppercase tracking-widest tabular-nums"></span>
+            </div>
+        </div>
+
+        <!-- Header Section -->
+        <header class="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-6 mb-12">
             <div class="space-y-2">
-                <div class="flex items-center gap-3">
-                    <span class="bg-blue-600 text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-[0.2em]">NFL • 2026</span>
-                    <div class="w-1 h-1 rounded-full bg-slate-700"></div>
-                    <span class="text-slate-500 text-[10px] font-black uppercase tracking-widest">Draft Central</span>
+                <div class="inline-block px-2 py-0.5 glass rounded-full border-white/5 mb-1">
+                    <span class="text-[8px] font-bold text-blue-400 uppercase tracking-widest leading-none">NFL Intelligence Feed</span>
                 </div>
-                <h1 class="text-4xl md:text-5xl font-black tracking-tighter italic uppercase leading-none">
-                    Live <span class="text-blue-500">Board</span>
-                </h1>
-                <div class="flex items-center gap-3">
-                    <p class="text-slate-400 text-sm font-bold flex items-center gap-2" id="draft-status-text">
-                        <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
-                        Connecting to Feed...
-                    </p>
-                    <span id="update-timestamp" class="text-[10px] text-slate-600 uppercase font-black"></span>
-                </div>
+                <h1 class="text-4xl font-black tracking-tight leading-none">2026 NFL Draft</h1>
+                <p class="text-white/30 font-medium max-w-xs text-xs" id="draft-status-text">Calibrating selection board...</p>
             </div>
 
-            <!-- Advanced Draft Completion Clock -->
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center gap-4 shadow-xl">
-                <div class="text-right">
-                    <p class="text-[9px] uppercase font-black text-slate-500 tracking-widest">Estimated Time To Conclusion</p>
-                    <p id="total-countdown" class="text-2xl font-black text-blue-500 tracking-tighter">--:--:--</p>
-                </div>
-                <div class="h-10 w-[1px] bg-slate-800"></div>
-                <div class="text-left">
-                    <p class="text-[9px] uppercase font-black text-slate-500 tracking-widest">Remaining Picks</p>
-                    <p id="remaining-picks-count" class="text-2xl font-black text-white tracking-tighter">--</p>
-                </div>
-            </div>
-
-            <!-- On The Clock Spotlight -->
-            <div id="clock-container" class="hidden w-full lg:w-80">
-                <div class="on-the-clock-pulse rounded-2xl p-4 shadow-2xl border flex items-center gap-4 transition-all duration-500">
-                    <div class="relative">
-                        <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-sm overflow-hidden border border-white/10">
-                            <img id="clock-team-logo" src="" class="w-8 h-8 object-contain team-logo-shadow hidden" alt="">
-                            <span id="clock-team-id" class="text-lg font-black text-white/50 italic">--</span>
-                        </div>
-                    </div>
+            <div class="flex flex-wrap gap-3 justify-end w-full lg:w-auto">
+                <!-- Dashboard -->
+                <div class="glass rounded-2xl p-4 px-6 flex items-center gap-6">
                     <div>
-                        <p class="text-[10px] uppercase font-black text-red-100 tracking-[0.15em] mb-0.5">On The Clock</p>
-                        <p class="text-xl font-black text-white italic tracking-tight uppercase leading-tight" id="clock-team-name">Loading...</p>
+                        <p class="text-[8px] font-bold text-white/20 uppercase tracking-widest mb-1">Est. Completion</p>
+                        <p id="total-countdown" class="text-xl font-bold tracking-tighter tabular-nums text-blue-500">--:--:--</p>
+                    </div>
+                    <div class="w-[1px] h-6 bg-white/10"></div>
+                    <div>
+                        <p class="text-[8px] font-bold text-white/20 uppercase tracking-widest mb-1">Remaining</p>
+                        <p id="remaining-picks-count" class="text-xl font-bold tracking-tighter tabular-nums text-white">--</p>
+                    </div>
+                </div>
+
+                <!-- Active Spotlight -->
+                <div id="clock-container" class="hidden">
+                    <div class="on-the-clock-active glass rounded-2xl p-4 px-6 flex items-center gap-4 border shadow-xl">
+                        <div class="w-10 h-10 glass-bright rounded-xl flex items-center justify-center p-2">
+                            <img id="clock-team-logo" src="" class="w-full h-full object-contain hidden" alt="">
+                            <span id="clock-team-id" class="text-[10px] font-bold text-white/20">--</span>
+                        </div>
+                        <div>
+                            <p class="text-[8px] font-bold text-red-500 uppercase tracking-widest mb-0.5">On The Clock</p>
+                            <p class="text-lg font-black text-white tracking-tight uppercase" id="clock-team-name">--</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- Round Navigation -->
+        <!-- Round Selection -->
         <nav class="flex gap-2 mb-8 overflow-x-auto pb-4 custom-scrollbar" id="round-nav">
             <!-- Buttons injected here -->
         </nav>
 
-        <!-- Draft Board Table -->
-        <div class="bg-slate-900 rounded-3xl border border-slate-800 overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+        <!-- Main Board -->
+        <div class="glass rounded-[1.5rem] overflow-hidden shadow-2xl border-white/5">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-slate-950/80 backdrop-blur-md text-slate-500 text-[10px] uppercase font-black tracking-[0.2em] border-b border-slate-800">
-                            <th class="px-8 py-5">Pick</th>
-                            <th class="px-8 py-5">Team</th>
-                            <th class="px-8 py-5">Selection / Player Profile</th>
+                        <tr class="glass-bright text-white/20 text-[9px] font-bold uppercase tracking-[0.2em] border-b border-white/5">
+                            <th class="px-6 py-4">Pick</th>
+                            <th class="px-6 py-4">Franchise</th>
+                            <th class="px-6 py-4">Selection Detail</th>
                         </tr>
                     </thead>
-                    <tbody id="pick-rows" class="divide-y divide-slate-800/50">
-                        <tr class="loading-shimmer"><td colspan="3" class="h-24"></td></tr>
+                    <tbody id="pick-rows" class="divide-y divide-white/5">
+                        <tr class="premium-shimmer"><td colspan="3" class="h-24"></td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
 
-        <footer class="mt-12 flex flex-col md:flex-row justify-between items-center gap-6 border-t border-slate-800 pt-8">
-            <div class="flex items-center gap-4">
-                <div class="bg-slate-800 px-3 py-1 rounded-md">
-                    <p class="text-slate-500 text-[10px] uppercase tracking-widest font-black">Data Source: ESPN Core API</p>
+        <footer class="mt-16 flex flex-col md:flex-row justify-between items-center gap-6 border-t border-white/5 pt-10 text-white/20">
+            <div class="flex items-center gap-6">
+                <div class="flex flex-col">
+                    <span class="text-[7px] font-black uppercase tracking-widest mb-0.5 opacity-40">Intelligence Core</span>
+                    <span class="text-[10px] font-bold tracking-widest uppercase">ESPN Core v2.0</span>
                 </div>
-                <div class="bg-slate-800 px-3 py-1 rounded-md">
-                    <p class="text-slate-500 text-[10px] uppercase tracking-widest font-black">Calculation: 4m/Pick (R7)</p>
+                <div class="flex flex-col">
+                    <span class="text-[7px] font-black uppercase tracking-widest mb-0.5 opacity-40">Latency</span>
+                    <span id="ping-timer" class="text-[10px] font-bold tracking-widest uppercase text-green-500/40">--ms</span>
                 </div>
             </div>
-            <button onclick="fetchDraftData()" class="group bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-3 active:scale-95 shadow-lg shadow-blue-900/20">
-                <svg class="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                Sync Live Data
-            </button>
+            
+            <div class="flex flex-col items-center md:items-end">
+                <span class="text-[7px] font-black uppercase tracking-[0.3em] mb-0.5 text-blue-500/60">Live Draft Protocol</span>
+                <span class="text-[10px] font-bold tracking-widest uppercase italic opacity-40">1s Update Cycle Active</span>
+            </div>
         </footer>
     </div>
 
     <script>
         const API_URL = 'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/draft/rounds?lang=en&region=us';
         const ATHLETE_BASE_URL = 'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/draft/athletes';
-        const REFRESH_INTERVAL = 45000;
+        const REFRESH_INTERVAL = 1000;
         const TOTAL_PICKS = 257;
         const MINUTES_PER_PICK_R7 = 4;
 
@@ -142,6 +234,7 @@
         };
 
         let currentData = null;
+        let lastDataHash = "";
         let activeRoundNumber = null;
         let isRefreshing = false;
 
@@ -149,6 +242,16 @@
             if (!ref) return null;
             const parts = ref.split('/');
             return parts[parts.length - 1].split('?')[0];
+        }
+
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return hash;
         }
 
         async function fetchDetails(type, id, urlOverride = null) {
@@ -159,27 +262,26 @@
             try {
                 const url = urlOverride ? urlOverride.replace('http:', 'https:') : `${ATHLETE_BASE_URL}/${id}?lang=en&region=us`;
                 const response = await fetch(url);
-                if (!response.ok) throw new Error('Detail fetch error');
                 const data = await response.json();
                 
                 if (type === 'athletes') {
                     cache.athletes.set(id, {
-                        name: data.displayName || 'Unknown Player',
-                        position: data.position?.abbreviation || 'N/A',
+                        name: data.displayName || 'Unknown Prospect',
+                        position: data.position?.abbreviation || 'TBD',
                         school: data.college?.name || null
                     });
                 } else if (type === 'teams') {
                     cache.teams.set(id, {
-                        name: data.displayName || data.name || 'Team',
+                        name: data.displayName || data.shortDisplayName || data.name || 'Franchise',
                         logo: data.logos?.[0]?.href || null,
-                        color: data.color || '1e293b'
+                        color: data.color ? `#${data.color}` : null
                     });
                 }
                 
                 renderPicks();
                 updateLiveIndicator();
             } catch (err) {
-                console.error(`Error fetching ${type} ${id}:`, err);
+                console.error(`Fetch error:`, err);
             } finally {
                 cache.loading.delete(cacheKey);
             }
@@ -189,29 +291,39 @@
             if (isRefreshing) return;
             isRefreshing = true;
             
-            const statusText = document.getElementById('draft-status-text');
-            statusText.innerText = "Syncing Rounds...";
-
+            const start = performance.now();
             try {
                 const response = await fetch(API_URL);
                 if (!response.ok) throw new Error('API Unavailable');
                 
-                const data = await response.json();
-                currentData = data;
+                const rawJson = await response.text();
+                const currentHash = simpleHash(rawJson);
                 
-                if (activeRoundNumber === null) {
-                    const liveRound = data.items.find(r => r.status?.type?.state === 'in');
-                    activeRoundNumber = liveRound ? liveRound.number : 1;
+                if (currentHash !== lastDataHash) {
+                    const data = JSON.parse(rawJson);
+                    currentData = data;
+                    lastDataHash = currentHash;
+                    
+                    if (activeRoundNumber === null) {
+                        const liveRound = data.items.find(r => r.status?.type?.state === 'in');
+                        activeRoundNumber = liveRound ? liveRound.number : 1;
+                    }
+
+                    updateUI();
+                    
+                    const statusText = document.getElementById('draft-status-text');
+                    statusText.innerText = liveRoundLabel();
                 }
 
-                updateUI();
-                
                 const now = new Date();
-                document.getElementById('update-timestamp').innerText = `Sync: ${now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
-                statusText.innerText = liveRoundLabel();
+                document.getElementById('update-timestamp').innerText = now.toLocaleTimeString([], {hour12: false, hour: '2-digit', minute:'2-digit', second:'2-digit'});
+                
+                const end = performance.now();
+                document.getElementById('ping-timer').innerText = `${Math.round(end - start)}ms`;
+                
             } catch (error) {
                 console.error("Fetch error:", error);
-                statusText.innerText = "Data Sync Error";
+                document.getElementById('draft-status-text').innerText = "Signal Loss - Reconnecting...";
             } finally {
                 isRefreshing = false;
             }
@@ -219,7 +331,7 @@
 
         function liveRoundLabel() {
             const liveRound = currentData.items.find(r => r.status?.type?.state === 'in');
-            return liveRound ? `Round ${liveRound.number} Live` : "Finalized Draft Board";
+            return liveRound ? `Round ${liveRound.number} • Selections Active` : "Broadcasting Finalized Feed";
         }
 
         function updateUI() {
@@ -236,10 +348,7 @@
             
             document.getElementById('remaining-picks-count').innerText = remainingPicksCount;
 
-            // Advanced Calculation: 4 mins per remaining pick (standard for R7)
-            // Plus an additional factor for "on the clock" time if available
             let totalSecondsRemaining = remainingPicksCount * MINUTES_PER_PICK_R7 * 60;
-            
             const hours = Math.floor(totalSecondsRemaining / 3600);
             const minutes = Math.floor((totalSecondsRemaining % 3600) / 60);
             const seconds = totalSecondsRemaining % 60;
@@ -257,13 +366,13 @@
                 const isLive = round.status?.type?.state === 'in';
                 const isActive = activeRoundNumber === round.number;
                 
-                btn.className = `px-6 py-3 rounded-2xl text-[11px] font-black tracking-widest uppercase transition-all whitespace-nowrap border ${
+                btn.className = `ios-pill px-5 py-1.5 text-[11px] font-bold transition-all whitespace-nowrap ${
                     isActive 
-                    ? 'bg-blue-600 border-blue-400 text-white shadow-xl shadow-blue-900/40 translate-y-[-2px]' 
-                    : 'bg-slate-800/50 border-slate-700 text-slate-500 hover:bg-slate-700 hover:text-slate-300'
+                    ? 'btn-active text-white' 
+                    : 'glass text-white/30 hover:text-white hover:bg-white/5'
                 }`;
                 
-                btn.innerHTML = `Round ${round.number} ${isLive ? '<span class="ml-2 w-2 h-2 rounded-full bg-red-500 inline-block animate-ping"></span>' : ''}`;
+                btn.innerHTML = `Round ${round.number} ${isLive ? '<span class="ml-1 w-1 h-1 rounded-full bg-red-500 inline-block animate-pulse shadow-[0_0_5px_#FF3B30]"></span>' : ''}`;
                 btn.onclick = () => {
                     activeRoundNumber = round.number;
                     updateUI();
@@ -296,55 +405,58 @@
                     if (cache.athletes.has(athleteId)) {
                         const player = cache.athletes.get(athleteId);
                         playerHtml = `
-                            <div class="flex flex-col gap-0.5">
-                                <div class="flex items-center gap-2">
-                                    <span class="text-blue-500 text-[10px] font-black uppercase tracking-widest leading-none">Drafted</span>
-                                    ${pick.traded ? '<span class="bg-amber-500/10 text-amber-500 text-[8px] font-black px-1.5 py-0.5 rounded uppercase border border-amber-500/20">Traded Pick</span>' : ''}
+                            <div class="flex flex-col">
+                                <div class="flex items-center gap-2 mb-0.5">
+                                    <span class="text-blue-400 text-[8px] font-black uppercase tracking-wider leading-none">Drafted</span>
+                                    ${pick.traded ? '<span class="bg-white/5 text-white/30 text-[7px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-widest border border-white/5">Traded</span>' : ''}
                                 </div>
-                                <span class="text-lg font-black text-white tracking-tight uppercase">${player.name}</span>
-                                <span class="text-[11px] text-slate-500 font-bold uppercase tracking-widest">
+                                <span class="text-sm font-bold text-white tracking-tight leading-none mb-0.5">${player.name}</span>
+                                <span class="text-[10px] text-white/40 font-medium uppercase tracking-widest">
                                     ${player.position} ${player.school ? `• ${player.school}` : ''}
                                 </span>
-                                ${pick.traded ? `<span class="text-[10px] text-slate-600 font-medium italic mt-0.5">${pick.tradeNote}</span>` : ''}
+                                ${pick.traded ? `<span class="text-[9px] text-white/20 font-medium italic mt-1 leading-tight">${pick.tradeNote}</span>` : ''}
                             </div>
                         `;
                     } else {
                         fetchDetails('athletes', athleteId);
-                        playerHtml = `<div class="flex flex-col gap-2"><div class="h-3 w-16 bg-slate-800 animate-pulse rounded"></div><div class="h-6 w-48 bg-slate-800 animate-pulse rounded-lg"></div></div>`;
+                        playerHtml = `<div class="premium-shimmer h-8 w-40 rounded-lg bg-white/5"></div>`;
                     }
                 } else {
                     playerHtml = `
-                        <div class="flex flex-col gap-3">
-                            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border w-fit ${isTrulyOnClock ? 'bg-red-600/10 border-red-500/50 text-red-500 animate-pulse' : 'bg-slate-800 border-slate-700 text-slate-500'}">
-                                <span class="text-[10px] font-black uppercase tracking-widest">
-                                    ${isTrulyOnClock ? 'On The Clock' : (isStatusOnClock ? 'Upcoming' : (pick.status?.description || 'Waiting'))}
+                        <div class="flex flex-col gap-2">
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border ${isTrulyOnClock ? 'bg-red-500/10 text-red-500 border-red-500/30 shadow-[0_0_10px_rgba(255,59,48,0.05)]' : 'bg-white/5 text-white/20 border-white/5'}">
+                                <span class="text-[9px] font-black uppercase tracking-widest leading-none">
+                                    ${isTrulyOnClock ? 'On Clock' : (isStatusOnClock ? 'Upcoming' : (pick.status?.description || 'Waiting'))}
                                 </span>
                             </div>
-                            ${pick.traded ? `<div class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span><span class="text-[10px] text-slate-500 font-bold uppercase tracking-tight">${pick.tradeNote}</span></div>` : ''}
+                            ${pick.traded ? `<div class="flex items-center gap-1.5"><span class="w-1 h-1 rounded-full bg-white/20"></span><span class="text-[9px] text-white/20 font-medium tracking-widest uppercase">${pick.tradeNote}</span></div>` : ''}
                         </div>
                     `;
                 }
 
                 const tr = document.createElement('tr');
-                tr.className = `group border-b border-slate-800/40 transition-all duration-300 ${isTrulyOnClock ? 'bg-blue-950/30' : 'hover:bg-slate-800/20'}`;
+                tr.className = `table-row team-tint transition-all duration-500 ${isTrulyOnClock ? 'bg-red-500/[0.04]' : ''}`;
+                if (team?.color) {
+                    tr.style.setProperty('--team-color', team.color);
+                }
                 
                 tr.innerHTML = `
-                    <td class="px-8 py-6 whitespace-nowrap">
-                        <div class="text-2xl font-black text-slate-400 group-hover:text-blue-400 transition-colors tracking-tighter">#${pick.overall || pick.pick}</div>
-                        <div class="text-[10px] text-slate-600 uppercase font-black tracking-widest">Pick ${pick.pick}</div>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-2xl font-black text-white/10 tracking-tighter tabular-nums leading-none mb-0.5">#${pick.overall || pick.pick}</div>
+                        <div class="text-[8px] text-white/20 font-bold uppercase tracking-widest">Pick ${pick.pick}</div>
                     </td>
-                    <td class="px-8 py-6 whitespace-nowrap">
+                    <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-slate-800/80 border border-slate-700 p-2 flex items-center justify-center shadow-lg group-hover:border-slate-500 transition-colors">
-                                ${team?.logo ? `<img src="${team.logo}" class="w-full h-full object-contain team-logo-shadow" />` : `<span class="text-xs font-black text-slate-600">${teamId}</span>`}
+                            <div class="w-10 h-10 glass-bright rounded-xl p-2 flex items-center justify-center shadow-lg" style="${team?.color ? `border-color: ${team.color}44; box-shadow: 0 0 10px ${team.color}11;` : ''}">
+                                ${team?.logo ? `<img src="${team.logo}" class="w-full h-full object-contain opacity-80" />` : `<span class="text-[9px] font-black text-white/10">${teamId}</span>`}
                             </div>
                             <div class="flex flex-col">
-                                <span class="font-black text-sm text-white tracking-wide uppercase">${team?.name || 'Loading...'}</span>
-                                <span class="text-[9px] text-slate-500 font-bold uppercase tracking-[0.2em]">NFL Franchise</span>
+                                <span class="text-sm font-bold text-white tracking-tight leading-none mb-0.5">${team?.name || 'Syncing...'}</span>
+                                <span class="text-[9px] text-white/20 font-bold uppercase tracking-[0.1em]">NFL Franchise</span>
                             </div>
                         </div>
                     </td>
-                    <td class="px-8 py-6">
+                    <td class="px-6 py-4">
                         ${playerHtml}
                     </td>
                 `;
@@ -361,7 +473,7 @@
                 const teamId = getId(onClock.team?.$ref);
                 const team = cache.teams.get(teamId);
                 
-                document.getElementById('clock-team-name').innerText = team ? team.name : 'Loading...';
+                document.getElementById('clock-team-name').innerText = team ? team.name : 'Resolving...';
                 const logoImg = document.getElementById('clock-team-logo');
                 const idText = document.getElementById('clock-team-id');
                 
