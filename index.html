@@ -59,18 +59,31 @@
                 </div>
             </div>
 
+            <!-- Advanced Draft Completion Clock -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex items-center gap-4 shadow-xl">
+                <div class="text-right">
+                    <p class="text-[9px] uppercase font-black text-slate-500 tracking-widest">Estimated Time To Conclusion</p>
+                    <p id="total-countdown" class="text-2xl font-black text-blue-500 tracking-tighter">--:--:--</p>
+                </div>
+                <div class="h-10 w-[1px] bg-slate-800"></div>
+                <div class="text-left">
+                    <p class="text-[9px] uppercase font-black text-slate-500 tracking-widest">Remaining Picks</p>
+                    <p id="remaining-picks-count" class="text-2xl font-black text-white tracking-tighter">--</p>
+                </div>
+            </div>
+
             <!-- On The Clock Spotlight -->
-            <div id="clock-container" class="hidden w-full lg:w-96">
-                <div class="on-the-clock-pulse rounded-2xl p-5 shadow-2xl border flex items-center gap-5 transition-all duration-500">
+            <div id="clock-container" class="hidden w-full lg:w-80">
+                <div class="on-the-clock-pulse rounded-2xl p-4 shadow-2xl border flex items-center gap-4 transition-all duration-500">
                     <div class="relative">
-                        <div class="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-sm overflow-hidden border border-white/10">
-                            <img id="clock-team-logo" src="" class="w-10 h-10 object-contain team-logo-shadow hidden" alt="">
-                            <span id="clock-team-id" class="text-xl font-black text-white/50 italic">--</span>
+                        <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center backdrop-blur-sm overflow-hidden border border-white/10">
+                            <img id="clock-team-logo" src="" class="w-8 h-8 object-contain team-logo-shadow hidden" alt="">
+                            <span id="clock-team-id" class="text-lg font-black text-white/50 italic">--</span>
                         </div>
                     </div>
                     <div>
-                        <p class="text-[10px] uppercase font-black text-red-100 tracking-[0.15em] mb-1">On The Clock</p>
-                        <p class="text-2xl font-black text-white italic tracking-tight uppercase leading-tight" id="clock-team-name">Loading...</p>
+                        <p class="text-[10px] uppercase font-black text-red-100 tracking-[0.15em] mb-0.5">On The Clock</p>
+                        <p class="text-xl font-black text-white italic tracking-tight uppercase leading-tight" id="clock-team-name">Loading...</p>
                     </div>
                 </div>
             </div>
@@ -105,7 +118,7 @@
                     <p class="text-slate-500 text-[10px] uppercase tracking-widest font-black">Data Source: ESPN Core API</p>
                 </div>
                 <div class="bg-slate-800 px-3 py-1 rounded-md">
-                    <p class="text-slate-500 text-[10px] uppercase tracking-widest font-black">Sync: Athlete Info & Team V2</p>
+                    <p class="text-slate-500 text-[10px] uppercase tracking-widest font-black">Calculation: 4m/Pick (R7)</p>
                 </div>
             </div>
             <button onclick="fetchDraftData()" class="group bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-3 active:scale-95 shadow-lg shadow-blue-900/20">
@@ -119,8 +132,9 @@
         const API_URL = 'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/draft/rounds?lang=en&region=us';
         const ATHLETE_BASE_URL = 'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/draft/athletes';
         const REFRESH_INTERVAL = 45000;
+        const TOTAL_PICKS = 257;
+        const MINUTES_PER_PICK_R7 = 4;
 
-        // In-memory caches for all entities
         const cache = {
             athletes: new Map(),
             teams: new Map(),
@@ -212,6 +226,26 @@
             renderRoundNav();
             renderPicks();
             updateLiveIndicator();
+            calculateCountdown();
+        }
+
+        function calculateCountdown() {
+            const allPicks = currentData.items.flatMap(r => r.picks || []);
+            const completedPicksCount = allPicks.filter(p => p.status?.name === "SELECTION_MADE").length;
+            const remainingPicksCount = TOTAL_PICKS - completedPicksCount;
+            
+            document.getElementById('remaining-picks-count').innerText = remainingPicksCount;
+
+            // Advanced Calculation: 4 mins per remaining pick (standard for R7)
+            // Plus an additional factor for "on the clock" time if available
+            let totalSecondsRemaining = remainingPicksCount * MINUTES_PER_PICK_R7 * 60;
+            
+            const hours = Math.floor(totalSecondsRemaining / 3600);
+            const minutes = Math.floor((totalSecondsRemaining % 3600) / 60);
+            const seconds = totalSecondsRemaining % 60;
+
+            document.getElementById('total-countdown').innerText = 
+                `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }
 
         function renderRoundNav() {
@@ -244,18 +278,19 @@
             
             if (!round || !round.picks) return;
 
+            const firstOnClockOverall = round.picks.find(p => p.status?.name === "ON_THE_CLOCK")?.overall;
+
             tbody.innerHTML = '';
             round.picks.forEach(pick => {
                 const teamId = getId(pick.team?.$ref);
                 const athleteId = getId(pick.athlete?.$ref);
-                const isOnClock = pick.status?.name === "ON_THE_CLOCK";
+                const isStatusOnClock = pick.status?.name === "ON_THE_CLOCK";
                 const isSelected = pick.status?.name === "SELECTION_MADE";
+                const isTrulyOnClock = isStatusOnClock && pick.overall === firstOnClockOverall;
 
-                // Team Details
                 if (teamId && !cache.teams.has(teamId)) fetchDetails('teams', teamId, pick.team.$ref);
                 const team = cache.teams.get(teamId);
 
-                // Athlete Details
                 let playerHtml = '';
                 if (isSelected && athleteId) {
                     if (cache.athletes.has(athleteId)) {
@@ -280,8 +315,10 @@
                 } else {
                     playerHtml = `
                         <div class="flex flex-col gap-3">
-                            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border w-fit ${isOnClock ? 'bg-red-600/10 border-red-500/50 text-red-500 animate-pulse' : 'bg-slate-800 border-slate-700 text-slate-500'}">
-                                <span class="text-[10px] font-black uppercase tracking-widest">${pick.status?.description || 'Waiting'}</span>
+                            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border w-fit ${isTrulyOnClock ? 'bg-red-600/10 border-red-500/50 text-red-500 animate-pulse' : 'bg-slate-800 border-slate-700 text-slate-500'}">
+                                <span class="text-[10px] font-black uppercase tracking-widest">
+                                    ${isTrulyOnClock ? 'On The Clock' : (isStatusOnClock ? 'Upcoming' : (pick.status?.description || 'Waiting'))}
+                                </span>
                             </div>
                             ${pick.traded ? `<div class="flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span><span class="text-[10px] text-slate-500 font-bold uppercase tracking-tight">${pick.tradeNote}</span></div>` : ''}
                         </div>
@@ -289,7 +326,7 @@
                 }
 
                 const tr = document.createElement('tr');
-                tr.className = `group border-b border-slate-800/40 transition-all duration-300 ${isOnClock ? 'bg-blue-950/30' : 'hover:bg-slate-800/20'}`;
+                tr.className = `group border-b border-slate-800/40 transition-all duration-300 ${isTrulyOnClock ? 'bg-blue-950/30' : 'hover:bg-slate-800/20'}`;
                 
                 tr.innerHTML = `
                     <td class="px-8 py-6 whitespace-nowrap">
