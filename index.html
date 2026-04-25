@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2026 NFL Draft | Glassmorphism Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         
@@ -98,7 +99,6 @@
             background: rgba(255, 255, 255, 0.04);
         }
         
-        /* Helper to ensure team color glows don't overpower text */
         .team-tint {
             position: relative;
         }
@@ -237,6 +237,7 @@
         let lastDataHash = "";
         let activeRoundNumber = null;
         let isRefreshing = false;
+        let hasCelebrated = false;
 
         function getId(ref) {
             if (!ref) return null;
@@ -252,6 +253,80 @@
                 hash = hash & hash;
             }
             return hash;
+        }
+
+        // Celebration Sound Engine (Synthesized)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playPopSound() {
+            const oscillator = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(150 + Math.random() * 400, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            oscillator.connect(gain);
+            gain.connect(audioCtx.destination);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.1);
+        }
+
+        function playBoomSound() {
+            const bufferSize = audioCtx.sampleRate * 1;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
+
+            const noise = audioCtx.createBufferSource();
+            noise.buffer = buffer;
+
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(400, audioCtx.currentTime);
+            filter.frequency.exponentialRampToValueAtTime(10, audioCtx.currentTime + 0.5);
+
+            const gain = audioCtx.createGain();
+            gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+
+            noise.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+            noise.start();
+            noise.stop(audioCtx.currentTime + 0.5);
+        }
+
+        function triggerGrandCelebration() {
+            if (hasCelebrated) return;
+            hasCelebrated = true;
+            
+            const duration = 22 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+
+                const particleCount = 50 * (timeLeft / duration);
+                
+                // Confetti from sides
+                confetti({ ...defaults, particleCount, origin: { x: Math.random(), y: Math.random() - 0.2 } });
+                
+                // Sound logic
+                if (Math.random() > 0.7) playPopSound();
+                if (Math.random() > 0.92) playBoomSound();
+
+                // Fireworks style bursts
+                if (Math.random() > 0.8) {
+                    confetti({
+                        particleCount: 80,
+                        spread: 120,
+                        origin: { y: 0.6, x: Math.random() },
+                        colors: ['#007AFF', '#FF3B30', '#FFD700', '#FFFFFF']
+                    });
+                }
+            }, 250);
         }
 
         async function fetchDetails(type, id, urlOverride = null) {
@@ -339,12 +414,21 @@
             renderPicks();
             updateLiveIndicator();
             calculateCountdown();
+            checkDraftCompletion();
+        }
+
+        function checkDraftCompletion() {
+            const allPicks = currentData.items.flatMap(r => r.picks || []);
+            const lastPick = allPicks.find(p => p.overall === TOTAL_PICKS);
+            if (lastPick && lastPick.status?.name === "SELECTION_MADE") {
+                triggerGrandCelebration();
+            }
         }
 
         function calculateCountdown() {
             const allPicks = currentData.items.flatMap(r => r.picks || []);
             const completedPicksCount = allPicks.filter(p => p.status?.name === "SELECTION_MADE").length;
-            const remainingPicksCount = TOTAL_PICKS - completedPicksCount;
+            const remainingPicksCount = Math.max(0, TOTAL_PICKS - completedPicksCount);
             
             document.getElementById('remaining-picks-count').innerText = remainingPicksCount;
 
