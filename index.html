@@ -40,6 +40,7 @@
             height: 95vh;
         }
 
+        /* Active RGB Shimmer Border */
         .container::before {
             content: "";
             position: absolute;
@@ -93,7 +94,7 @@
         .last-check { font-size: 8px; color: #666; text-transform: none; }
 
         .main-pick {
-            padding: 30px 20px;
+            padding: 25px 20px;
             text-align: center;
             background: radial-gradient(circle at center, #222 0%, #0a0a0a 100%);
             flex-shrink: 0;
@@ -101,7 +102,7 @@
 
         .pick-number {
             font-family: 'Oswald', sans-serif;
-            font-size: 100px;
+            font-size: 110px;
             line-height: 1;
             font-weight: 700;
             margin: 0;
@@ -112,7 +113,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
             background-color: var(--br-black);
-            padding: 15px 0;
+            padding: 12px 0;
             border-top: 1px solid #222;
             border-bottom: 1px solid #222;
             flex-shrink: 0;
@@ -131,8 +132,9 @@
             -webkit-text-fill-color: transparent;
         }
 
-        .stat-label { font-size: 9px; color: #666; letter-spacing: 1px; margin-top: 4px; }
+        .stat-label { font-size: 9px; color: #666; letter-spacing: 1px; margin-top: 2px; }
 
+        /* Latest Selection Card */
         .latest-selection {
             background-color: #000;
             margin: 15px;
@@ -161,39 +163,50 @@
             border-radius: 4px;
         }
 
-        .team-logo {
-            width: 50px; height: 50px;
+        .team-logo-main {
+            width: 55px; height: 55px;
             background: #111; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             padding: 5px;
+            border: 1px solid #222;
         }
-        .team-logo img { width: 100%; height: auto; }
+        .team-logo-main img { width: 100%; height: auto; }
 
         .player-info { text-align: left; overflow: hidden; }
-        .player-name { font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700; color: #fff; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .player-detail { font-size: 11px; color: #888; margin: 0; }
+        .player-name { font-family: 'Oswald', sans-serif; font-size: 20px; font-weight: 700; color: #fff; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .player-detail { font-size: 12px; color: #888; margin: 0; }
+
+        /* Full Draft Board */
+        .board-header {
+            padding: 10px 15px;
+            background: #111;
+            font-size: 10px;
+            letter-spacing: 1px;
+            color: #555;
+            font-weight: 700;
+            border-bottom: 1px solid #222;
+        }
 
         .history-container {
             flex-grow: 1;
             overflow-y: auto;
             background: #050505;
-            border-top: 1px solid #222;
         }
 
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th {
             position: sticky; top: 0; background: #111;
-            padding: 10px; text-align: left; color: #555;
-            font-size: 10px; z-index: 5;
+            padding: 8px 15px; text-align: left; color: #444;
+            font-size: 9px; z-index: 5;
         }
-        td { padding: 12px 10px; border-bottom: 1px solid #111; color: #ccc; }
-        .td-pick { font-family: 'Oswald', sans-serif; color: #666; width: 40px; }
+        td { padding: 12px 15px; border-bottom: 1px solid #111; color: #ccc; }
+        .td-pick { font-family: 'Oswald', sans-serif; color: #444; width: 30px; font-size: 14px; }
         .td-team { width: 40px; text-align: center; }
-        .td-team img { width: 22px; height: auto; opacity: 0.8; }
-        .td-player { font-weight: 700; color: #eee; }
-        .td-school { color: #666; font-size: 10px; }
+        .td-team img { width: 24px; height: auto; opacity: 0.9; }
+        .td-player { font-weight: 700; color: #fff; font-size: 13px; }
+        .td-school { color: #666; font-size: 10px; letter-spacing: 0.5px; }
 
-        .controls { padding: 20px; background-color: var(--br-grey); flex-shrink: 0; }
+        .controls { padding: 20px; background-color: var(--br-grey); flex-shrink: 0; border-top: 1px solid #222; }
 
         .btn-next {
             background: var(--br-rainbow);
@@ -201,45 +214,20 @@
             animation: shimmer 3s linear infinite;
             color: #000;
             font-family: 'Oswald', sans-serif;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 700;
             border-radius: 4px;
-            padding: 15px;
-            margin-bottom: 10px;
+            padding: 16px;
             cursor: pointer;
             border: none;
             width: 100%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-
-        .nap-tracker {
-            background: #000;
-            padding: 15px 25px;
-            border-top: 1px solid #222;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-shrink: 0;
-        }
-
-        .nap-time { font-family: 'Oswald', sans-serif; font-size: 24px; color: #C7CEEA; }
-
-        .nap-controls { display: flex; gap: 10px; }
-        .nap-controls button {
-            width: 36px; height: 36px; font-size: 16px;
-            background: #1a1a1a; color: #fff;
-            border: 1px solid #333; border-radius: 8px;
-            cursor: pointer;
-        }
-        .nap-controls button.active {
-            background: var(--br-rainbow);
-            background-size: 300% auto;
-            animation: shimmer 3s linear infinite;
-            color: #000; border: none;
-        }
+        .btn-next:active { transform: scale(0.98); }
 
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: #050505; }
-        ::-webkit-scrollbar-thumb { background: #222; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 5px; }
     </style>
 </head>
 <body>
@@ -257,7 +245,7 @@
         </div>
 
         <div class="main-pick">
-            <div style="font-size: 14px; letter-spacing: 3px; color: #888; margin-bottom: 5px;">ON THE CLOCK</div>
+            <div style="font-size: 12px; letter-spacing: 4px; color: #666; margin-bottom: 5px;">ON THE CLOCK</div>
             <h1 class="pick-number" id="pickDisplay">204</h1>
         </div>
 
@@ -268,15 +256,16 @@
         </div>
 
         <div class="latest-selection" id="latestCard">
-            <div class="team-logo" id="latestLogo">
+            <div class="team-logo-main" id="latestLogo">
                 <svg viewBox="0 0 24 24" fill="#333" width="30"><path d="M12 2L2 7v10l10 5 10-5V7L12 2z"/></svg>
             </div>
             <div class="player-info">
-                <p class="player-name" id="latestName">Waiting for sync...</p>
-                <p class="player-detail" id="latestDetail">New picks will appear here</p>
+                <p class="player-name" id="latestName">Syncing Board...</p>
+                <p class="player-detail" id="latestDetail">Fetching latest data</p>
             </div>
         </div>
 
+        <div class="board-header">RECENT SELECTIONS</div>
         <div class="history-container">
             <table>
                 <thead>
@@ -292,18 +281,8 @@
 
         <div class="controls">
             <button class="btn-next" id="mainBtn" onclick="submitPick()">Submit Pick 204</button>
-            <button style="background: transparent; color: #444; border: 1px solid #222; font-size: 11px; padding: 8px; cursor: pointer; width: 100%; border-radius: 4px;" onclick="resetTo204()">Hard Reset Tracker</button>
-        </div>
-
-        <div class="nap-tracker">
-            <div>
-                <div style="font-size: 9px; color: #555; font-weight: bold; letter-spacing: 1px;">RED'S NAP TIMER</div>
-                <div class="nap-time" id="napDisplay">00:00:00</div>
-            </div>
-            <div class="nap-controls">
-                <button id="napPlay" onclick="setNap(true)">▶</button>
-                <button id="napPause" onclick="setNap(false)">⏸</button>
-                <button onclick="resetNap()">↺</button>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button style="flex: 1; background: transparent; color: #444; border: 1px solid #222; font-size: 10px; padding: 6px; cursor: pointer; border-radius: 4px;" onclick="resetTo204()">Reset Tracker</button>
             </div>
         </div>
     </div>
@@ -327,11 +306,8 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
         const draftPath = `artifacts/${config.projectId}/public/data/draftState/current`;
-        const napPath = `artifacts/${config.projectId}/public/data/napState/current`;
 
         let currentPick = 204;
-        let napSeconds = 0;
-        let napActive = false;
         let countdownSec = 0;
         let pickHistory = [];
 
@@ -348,24 +324,28 @@
             document.getElementById('countDisplay').innerText = Math.max(0, 257 - currentPick);
             document.getElementById('mainBtn').innerText = currentPick > 257 ? "DRAFT COMPLETE" : `Submit Pick ${currentPick}`;
             
+            // Est Time
             countdownSec = 0;
             for (let i = currentPick; i <= 257; i++) {
                 countdownSec += (i >= 217) ? 139 : 174;
             }
             document.getElementById('timerDisplay').innerText = format(countdownSec);
 
+            // Latest Card
             if (pickHistory.length > 0) {
                 const latest = pickHistory[0];
-                document.getElementById('latestName').innerText = latest.player || "Selected";
-                document.getElementById('latestDetail').innerText = `${latest.pos || "POS"} | ${latest.school || "School"}`;
+                document.getElementById('latestName').innerText = latest.player;
+                document.getElementById('latestDetail').innerText = `${latest.pos} | ${latest.school}`;
                 if (latest.logo) {
                     document.getElementById('latestLogo').innerHTML = `<img src="${latest.logo}" alt="team">`;
                 }
             }
             
+            // Table
             const tbody = document.getElementById('draftBoardBody');
             tbody.innerHTML = '';
-            pickHistory.forEach(pick => {
+            // Show up to 15 recent picks
+            pickHistory.slice(0, 15).forEach(pick => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td class="td-pick">${pick.number}</td>
@@ -389,23 +369,21 @@
             }
         }
 
-        // --- IMPROVED ESPN API FETCH ---
+        // --- RESILIENT ESPN FETCH ---
         async function fetchEspnDraft() {
             const apiIndicator = document.getElementById('apiIndicator');
             const statusText = apiIndicator.querySelector('.status-text');
             const syncTimeText = document.getElementById('lastSyncTime');
 
+            // Trying AllOrigins specifically for the site-api which contains player details
+            const targetUrl = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/draft/board';
+            
             try {
-                // Using corsproxy.io for better reliability than allorigins
-                const targetUrl = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl/draft/board';
-                const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(targetUrl)}`);
+                const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}&timestamp=${Date.now()}`);
+                if (!response.ok) throw new Error();
+                const result = await response.json();
+                const data = JSON.parse(result.contents);
                 
-                if (!response.ok) throw new Error('Proxy failed');
-                const data = await response.json();
-                
-                const now = new Date().toLocaleTimeString();
-                syncTimeText.innerText = `Last Sync: ${now}`;
-
                 if (data && data.draft && data.draft.picks) {
                     const allPicks = data.draft.picks;
                     const madePicks = allPicks.filter(p => p.player);
@@ -419,39 +397,40 @@
                         team: p.team ? p.team.displayName : 'TBD'
                     })).sort((a, b) => b.number - a.number);
 
-                    const latestPickNumMade = newHistory.length > 0 ? newHistory[0].number : 0;
-                    const latestPickOnClock = latestPickNumMade + 1;
-                    
-                    // Always update history locally
                     pickHistory = newHistory;
-
-                    if (latestPickOnClock > currentPick) {
-                        currentPick = latestPickOnClock;
-                        if (!auth.currentUser) await auth.signInAnonymously();
-                        await db.doc(draftPath).set({ 
-                            currentPick, 
-                            history: pickHistory.slice(0, 20), // Sync top 20 picks
-                            lastUpdated: Date.now() 
-                        }, { merge: true });
-                    }
+                    const latestMade = newHistory.length > 0 ? newHistory[0].number : 0;
                     
+                    if (latestMade + 1 > currentPick) {
+                        currentPick = latestMade + 1;
+                        syncWithFirebase();
+                    }
+
+                    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    syncTimeText.innerText = `Sync: ${now}`;
                     statusText.innerText = "ESPN API: LIVE";
                     apiIndicator.className = 'api-status active';
                     updateUI();
                 }
-            } catch (error) {
-                console.error("Fetch Error:", error);
-                statusText.innerText = "ESPN API: SYNC ERROR";
-                syncTimeText.innerText = "Re-trying in 15s...";
+            } catch (e) {
+                statusText.innerText = "ESPN API: RETRYING...";
                 apiIndicator.className = 'api-status error';
             }
+        }
+
+        async function syncWithFirebase() {
+            if (!auth.currentUser) await auth.signInAnonymously();
+            await db.doc(draftPath).set({ 
+                currentPick, 
+                history: pickHistory.slice(0, 20),
+                lastUpdated: Date.now() 
+            }, { merge: true });
         }
 
         setInterval(fetchEspnDraft, 15000);
         fetchEspnDraft();
 
         async function resetTo204() {
-            if (confirm("Reset to Pick 204?")) {
+            if (confirm("Reset to 204?")) {
                 currentPick = 204;
                 pickHistory = [];
                 updateUI();
@@ -460,33 +439,10 @@
             }
         }
 
-        function updateNapUI() {
-            document.getElementById('napDisplay').innerText = format(napSeconds);
-            document.getElementById('napPlay').className = napActive ? 'active' : '';
-        }
-
-        async function setNap(active) {
-            napActive = active;
-            updateNapUI();
-            if (!auth.currentUser) await auth.signInAnonymously();
-            await db.doc(napPath).set({ napActive, napSeconds }, { merge: true });
-        }
-
-        async function resetNap() {
-            napSeconds = 0; napActive = false;
-            updateNapUI();
-            if (!auth.currentUser) await auth.signInAnonymously();
-            await db.doc(napPath).set({ napActive, napSeconds }, { merge: true });
-        }
-
         setInterval(() => {
             if (countdownSec > 0) {
                 countdownSec--;
                 document.getElementById('timerDisplay').innerText = format(countdownSec);
-            }
-            if (napActive) {
-                napSeconds++;
-                updateNapUI();
             }
         }, 1000);
 
@@ -499,8 +455,7 @@
                     if (data.currentPick && data.currentPick > currentPick) {
                         currentPick = data.currentPick;
                     }
-                    if (data.history && data.history.length > 0) {
-                        // Merge logic: prioritize the latest info
+                    if (data.history) {
                         const merged = [...data.history, ...pickHistory];
                         const unique = Array.from(new Set(merged.map(a => a.number)))
                             .map(num => merged.find(a => a.number === num))
@@ -508,15 +463,6 @@
                         pickHistory = unique;
                     }
                     updateUI();
-                }
-            }, err => console.error("Firebase Sync Error:", err));
-
-            db.doc(napPath).onSnapshot(doc => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    if (data.napSeconds > napSeconds) napSeconds = data.napSeconds;
-                    napActive = data.napActive;
-                    updateNapUI();
                 }
             });
         }
