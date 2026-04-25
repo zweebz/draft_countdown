@@ -40,9 +40,7 @@
         .container::before {
             content: "";
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             height: 6px;
             background: var(--br-rainbow);
             background-size: 300% 300%;
@@ -64,8 +62,6 @@
             font-weight: 700;
             font-size: 20px;
             letter-spacing: -0.5px;
-            display: flex;
-            align-items: center;
             background: var(--br-rainbow);
             background-size: 300% 300%;
             animation: shimmer 4s linear infinite;
@@ -96,15 +92,15 @@
             animation: pulse 1.5s infinite, shimmer 4s linear infinite;
         }
 
+        @keyframes shimmer {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
         @keyframes pulse {
             0% { opacity: 1; }
             50% { opacity: 0.3; }
             100% { opacity: 1; }
-        }
-
-        @keyframes shimmer {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 100% 50%; }
         }
 
         .main-pick {
@@ -144,14 +140,8 @@
             border-bottom: 1px solid var(--br-light-grey);
         }
 
-        .stat-item {
-            text-align: center;
-            border-right: 1px solid var(--br-light-grey);
-        }
-
-        .stat-item:last-child {
-            border-right: none;
-        }
+        .stat-item { text-align: center; border-right: 1px solid var(--br-light-grey); }
+        .stat-item:last-child { border-right: none; }
 
         .stat-value {
             font-family: 'Oswald', sans-serif;
@@ -163,17 +153,9 @@
             -webkit-text-fill-color: transparent;
         }
 
-        .stat-label {
-            font-size: 10px;
-            color: #888;
-            letter-spacing: 1px;
-            margin-top: 4px;
-        }
+        .stat-label { font-size: 10px; color: #888; letter-spacing: 1px; margin-top: 4px; }
 
-        .controls {
-            padding: 25px;
-            background-color: var(--br-grey);
-        }
+        .controls { padding: 25px; background-color: var(--br-grey); }
 
         button {
             width: 100%;
@@ -195,18 +177,7 @@
             margin-bottom: 15px;
         }
 
-        .btn-next:hover {
-            filter: brightness(1.1);
-            transform: scale(1.01);
-        }
-
-        .btn-reset {
-            background-color: transparent;
-            color: #666;
-            font-size: 14px;
-            padding: 10px;
-            border: 1px solid #444;
-        }
+        .btn-reset { background-color: transparent; color: #666; font-size: 14px; padding: 10px; border: 1px solid #444; }
 
         .nap-tracker {
             padding: 15px 25px;
@@ -217,84 +188,25 @@
             align-items: center;
         }
 
-        .nap-info {
-            display: flex;
-            flex-direction: column;
-            text-align: left;
-        }
+        .nap-time { font-family: 'Oswald', sans-serif; font-size: 24px; color: var(--br-pastel-blue); }
 
-        .nap-title {
-            font-size: 11px;
-            color: #888;
-            letter-spacing: 1px;
-            font-weight: bold;
-        }
-
-        .nap-time {
-            font-family: 'Oswald', sans-serif;
-            font-size: 24px;
-            color: var(--br-pastel-blue);
-        }
-
-        .nap-controls {
-            display: flex;
-            gap: 10px;
-        }
-
+        .nap-controls { display: flex; gap: 10px; }
         .nap-controls button {
-            width: 40px;
-            height: 40px;
-            padding: 0;
-            font-size: 16px;
-            background-color: var(--br-grey);
-            color: var(--br-white);
-            border: 1px solid #444;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 40px; height: 40px; font-size: 16px;
+            background-color: var(--br-grey); color: var(--br-white);
+            border: 1px solid #444; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
         }
 
         .nap-controls button.active {
-            background: var(--br-rainbow);
-            background-size: 300% 300%;
-            animation: shimmer 4s linear infinite;
-            color: var(--br-black);
-            border: none;
+            background: var(--br-rainbow); background-size: 300% 300%;
+            animation: shimmer 4s linear infinite; color: var(--br-black); border: none;
         }
 
-        .history {
-            padding: 15px;
-            max-height: 120px;
-            overflow-y: auto;
-            background-color: var(--br-black);
-            font-size: 13px;
-            border-top: 1px solid var(--br-light-grey);
-        }
-
-        .history-title {
-            color: #555;
-            font-weight: bold;
-            margin-bottom: 8px;
-            font-size: 11px;
-            position: sticky;
-            top: 0;
-            background: var(--br-black);
-        }
-
-        .history-item {
-            padding: 4px 0;
-            border-bottom: 1px solid #222;
-            display: flex;
-            justify-content: space-between;
-        }
-
+        .history { padding: 15px; max-height: 120px; overflow-y: auto; background-color: var(--br-black); font-size: 13px; border-top: 1px solid var(--br-light-grey); }
+        .history-title { color: #555; font-weight: bold; margin-bottom: 8px; font-size: 11px; }
+        .history-item { padding: 4px 0; border-bottom: 1px solid #222; display: flex; justify-content: space-between; }
         .history-item span:first-child { color: #888; }
-        .history-item span:last-child { color: var(--br-pastel-blue); }
-
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: var(--br-black); }
-        ::-webkit-scrollbar-thumb { background: var(--br-light-grey); }
     </style>
 </head>
 <body>
@@ -311,18 +223,9 @@
         </div>
 
         <div class="stats-bar">
-            <div class="stat-item">
-                <div class="stat-value" id="remainingCount">72</div>
-                <div class="stat-label">Picks Left</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="timeRemaining">00:00:00</div>
-                <div class="stat-label">Est. Time</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value">257</div>
-                <div class="stat-label">Final Pick</div>
-            </div>
+            <div class="stat-item"><div class="stat-value" id="remainingCount">72</div><div class="stat-label">Picks Left</div></div>
+            <div class="stat-item"><div class="stat-value" id="timeRemaining">00:00:00</div><div class="stat-label">Est. Time</div></div>
+            <div class="stat-item"><div class="stat-value">257</div><div class="stat-label">Final Pick</div></div>
         </div>
 
         <div class="controls">
@@ -332,27 +235,36 @@
 
         <div class="nap-tracker">
             <div class="nap-info">
-                <div class="nap-title">RED'S NAP TIME</div>
+                <div style="font-size: 11px; color: #888; font-weight: bold;">RED'S NAP TIME</div>
                 <div class="nap-time" id="napTimeDisplay">00:00:00</div>
             </div>
             <div class="nap-controls">
-                <button id="napPlayBtn" onclick="startNap()" title="Play">▶</button>
-                <button id="napPauseBtn" onclick="pauseNap()" title="Pause">⏸</button>
-                <button id="napResetBtn" onclick="resetNap()" title="Reset">↺</button>
+                <button id="napPlayBtn" onclick="startNap()">▶</button>
+                <button id="napPauseBtn" onclick="pauseNap()">⏸</button>
+                <button id="napResetBtn" onclick="resetNap()">↺</button>
             </div>
         </div>
 
-        <div class="history" id="historyLog">
-            <div class="history-title">Recent Activity</div>
-        </div>
+        <div class="history" id="historyLog"><div class="history-title">Recent Activity</div></div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // Setup constants first
+        // Use YOUR config credentials
+        const firebaseConfig = {
+            apiKey: "AIzaSyDecV3qGqmwD6T7B2TAHfb3FT5jegIWBLk",
+            authDomain: "drafttracker-b6720.firebaseapp.com",
+            projectId: "drafttracker-b6720",
+            storageBucket: "drafttracker-b6720.firebasestorage.app",
+            messagingSenderId: "745753068393",
+            appId: "1:745753068393:web:5188024ae9abc9bd3573f8"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         let currentPick = 185;
         const finalPick = 257;
         const round7StartPick = 217;
@@ -378,28 +290,10 @@
             return [h, m, s].map(v => v.toString().padStart(2, '0')).join(':');
         }
 
-        function addToLog(message) {
-            const log = document.getElementById('historyLog');
-            const newItem = document.createElement('div');
-            newItem.className = 'history-item';
-            const now = new Date();
-            const timeStr = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
-            newItem.innerHTML = `<span>${message}</span><span>${timeStr}</span>`;
-            
-            const title = log.querySelector('.history-title');
-            if (title && title.nextSibling) {
-                log.insertBefore(newItem, title.nextSibling);
-            } else {
-                log.appendChild(newItem);
-            }
-        }
-
         function updateUI() {
             document.getElementById('currentPickDisplay').innerText = currentPick;
             document.getElementById('remainingCount').innerText = Math.max(0, finalPick - currentPick);
-            
             const btn = document.getElementById('submitBtn');
-            const label = document.getElementById('statusLabel');
             const display = document.getElementById('currentPickDisplay');
 
             if (currentPick > finalPick) {
@@ -408,19 +302,11 @@
                 display.style.animation = "shimmer 4s linear infinite";
                 display.style.webkitBackgroundClip = "text";
                 display.style.webkitTextFillColor = "transparent";
-                label.innerText = "Draft Complete";
-                btn.innerText = "Mr. Irrelevant Selected";
+                btn.innerText = "Draft Complete";
                 btn.disabled = true;
-                btn.style.opacity = "0.5";
                 totalSecondsRemaining = 0;
             } else {
-                display.style.background = "none";
-                display.style.webkitBackgroundClip = "initial";
-                display.style.webkitTextFillColor = "initial";
-                display.style.color = "#ffffff";
                 btn.innerText = `Submit Pick ${currentPick}`;
-                btn.disabled = false;
-                btn.style.opacity = "1";
                 totalSecondsRemaining = calculateRemainingSeconds(currentPick);
             }
             document.getElementById('timeRemaining').innerText = formatTime(totalSecondsRemaining);
@@ -438,75 +324,17 @@
 
         function makePick() {
             if (currentPick <= finalPick) {
-                addToLog(`Pick ${currentPick} Processed`);
                 currentPick++;
                 updateUI();
-                saveDraftState();
+                db.doc("draftData/current").set({ currentPick });
             }
         }
-
-        // --- Firebase Handling ---
-        let db, auth, appId;
-        let draftDocPath, napDocPath;
-
-        async function saveDraftState() {
-            if (!auth || !auth.currentUser) return;
-            try {
-                await db.doc(draftDocPath).set({
-                    currentPick: currentPick,
-                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
-            } catch (err) {}
-        }
-
-        const init = async () => {
-            try {
-                const firebaseConfig = JSON.parse(__firebase_config);
-                appId = typeof __app_id !== 'undefined' ? __app_id : 'draft-tracker-default';
-                firebase.initializeApp(firebaseConfig);
-                db = firebase.firestore();
-                auth = firebase.auth();
-                
-                draftDocPath = `artifacts/${appId}/public/data/draftState/current`;
-                napDocPath = `artifacts/${appId}/public/data/napState/current`;
-
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await auth.signInWithCustomToken(__initial_auth_token);
-                } else {
-                    await auth.signInAnonymously();
-                }
-
-                auth.onAuthStateChanged(user => {
-                    if (!user) return;
-                    db.doc(draftDocPath).onSnapshot(doc => {
-                        if (doc.exists) {
-                            const data = doc.data();
-                            if (data.currentPick && data.currentPick !== currentPick) {
-                                currentPick = data.currentPick;
-                                updateUI();
-                            }
-                        }
-                    });
-                    db.doc(napDocPath).onSnapshot(doc => {
-                        if (doc.exists) {
-                            const data = doc.data();
-                            napSeconds = data.napSeconds || 0;
-                            updateNapDisplay();
-                            if (data.napIsRunning && !napInterval) startNap(false);
-                            else if (!data.napIsRunning && napInterval) pauseNap(false);
-                        }
-                    });
-                });
-            } catch (err) {
-                console.error("Initialization Failed", err);
-            }
-        };
 
         async function resetDraft() {
-            if (confirm("Reset tracking back to Pick 185?")) {
+            if (confirm("Reset to Pick 185?")) {
                 currentPick = 185;
                 updateUI();
-                await saveDraftState();
+                db.doc("draftData/current").set({ currentPick });
             }
         }
 
@@ -515,50 +343,48 @@
         let napInterval = null;
         let napIsRunning = false;
 
-        function updateNapDisplay() {
-            document.getElementById('napTimeDisplay').innerText = formatTime(napSeconds);
-        }
+        function updateNapDisplay() { document.getElementById('napTimeDisplay').innerText = formatTime(napSeconds); }
 
-        async function saveNapState() {
-            if (!auth || !auth.currentUser) return;
-            try {
-                await db.doc(napDocPath).set({ napSeconds, napIsRunning, lastUpdated: firebase.firestore.FieldValue.serverTimestamp() }, { merge: true });
-            } catch (err) {}
-        }
-
-        function startNap(shouldSave = true) {
+        function startNap() {
             if (!napInterval) {
                 napIsRunning = true;
                 napInterval = setInterval(() => { napSeconds++; updateNapDisplay(); }, 1000);
                 document.getElementById('napPlayBtn').classList.add('active');
-                document.getElementById('napPauseBtn').classList.remove('active');
-                if (shouldSave) saveNapState();
+                db.doc("napData/current").set({ napSeconds, napIsRunning });
             }
         }
 
-        function pauseNap(shouldSave = true) {
+        function pauseNap() {
             if (napInterval) {
                 napIsRunning = false;
                 clearInterval(napInterval);
                 napInterval = null;
                 document.getElementById('napPlayBtn').classList.remove('active');
-                document.getElementById('napPauseBtn').classList.add('active');
-                if (shouldSave) saveNapState();
+                db.doc("napData/current").set({ napSeconds, napIsRunning });
             }
         }
 
-        function resetNap() {
-            pauseNap();
-            napSeconds = 0;
-            updateNapDisplay();
-            document.getElementById('napPauseBtn').classList.remove('active');
-            saveNapState();
-        }
+        function resetNap() { pauseNap(); napSeconds = 0; updateNapDisplay(); db.doc("napData/current").set({ napSeconds, napIsRunning }); }
 
-        // Start
+        // --- REAL TIME SYNC ---
+        db.doc("draftData/current").onSnapshot(doc => {
+            if (doc.exists) {
+                currentPick = doc.data().currentPick;
+                updateUI();
+            }
+        });
+
+        db.doc("napData/current").onSnapshot(doc => {
+            if (doc.exists) {
+                napSeconds = doc.data().napSeconds;
+                updateNapDisplay();
+                if (doc.data().napIsRunning && !napInterval) startNap();
+                else if (!doc.data().napIsRunning && napInterval) pauseNap();
+            }
+        });
+
         updateUI();
         startTimer();
-        init();
     </script>
 </body>
 </html>
