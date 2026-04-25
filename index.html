@@ -305,7 +305,8 @@
         firebase.initializeApp(config);
         const db = firebase.firestore();
         const auth = firebase.auth();
-        const draftPath = `artifacts/${config.projectId}/public/data/draftState/current`;
+        const appId = config.projectId;
+        const draftPath = `artifacts/${appId}/public/data/draftState/current`;
 
         let currentPick = 204;
         let pickHistory = [];
@@ -332,7 +333,7 @@
 
             if (pickHistory.length > 0) {
                 const latest = pickHistory[0];
-                document.getElementById('latestName').innerText = latest.player || "Selected";
+                document.getElementById('latestName').innerText = latest.player || "Syncing...";
                 document.getElementById('latestDetail').innerText = `${latest.pos || "-"} | ${latest.school || "-"}`;
                 if (latest.logo) {
                     document.getElementById('latestLogo').innerHTML = `<img src="${latest.logo}" alt="team">`;
@@ -341,14 +342,15 @@
             
             const tbody = document.getElementById('draftBoardBody');
             tbody.innerHTML = '';
-            pickHistory.slice(0, 15).forEach(pick => {
+            // Display exactly the last 10 picks
+            pickHistory.slice(0, 10).forEach(pick => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td class="td-pick">${pick.number}</td>
-                    <td class="td-team">${pick.logo ? `<img src="${pick.logo}" alt="">` : '-'}</td>
+                    <td class="td-team">${pick.logo ? `<img src="${pick.logo}" alt="">` : ''}</td>
                     <td>
-                        <div class="td-player">${pick.player || "Loading..."}</div>
-                        <div class="td-school">${pick.pos || ""} | ${pick.school || ""}</div>
+                        <div class="td-player">${pick.player || "Drafting..."}</div>
+                        <div class="td-school">${pick.pos || ""} ${pick.school ? "| " + pick.school : ""}</div>
                     </td>
                 `;
                 tbody.appendChild(row);
@@ -365,31 +367,29 @@
             }
         }
 
-        // --- IMPROVED RESILIENT API PROXY ---
+        // --- ENHANCED RESILIENT PROXY ROTATION ---
         async function fetchWithProxy(url) {
-            // Force HTTPS for Core API
             const secureUrl = url.replace('http://', 'https://');
+            const encodedUrl = encodeURIComponent(secureUrl);
             
-            // Try Proxy 1: AllOrigins
-            try {
-                const res = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(secureUrl)}&t=${Date.now()}`);
-                if (res.ok) {
-                    const json = await res.json();
-                    return JSON.parse(json.contents);
+            // Proxy Array: [Service URL Template, Result Parser Function]
+            const proxies = [
+                [`https://corsproxy.io/?${encodedUrl}`, r => r.json()],
+                [`https://api.allorigins.win/get?url=${encodedUrl}&t=${Date.now()}`, async r => JSON.parse((await r.json()).contents)],
+                [`https://api.codetabs.com/v1/proxy?quest=${encodedUrl}`, r => r.json()]
+            ];
+
+            for (let [template, parser] of proxies) {
+                try {
+                    const response = await fetch(template, { cache: "no-store" });
+                    if (response.ok) {
+                        return await parser(response);
+                    }
+                } catch (e) {
+                    console.warn(`Proxy ${template.split('/')[2]} failed, trying next...`);
                 }
-            } catch (e) {
-                console.warn("AllOrigins failed, trying CorsProxy.io...");
             }
-
-            // Try Proxy 2: CorsProxy.io
-            try {
-                const res = await fetch(`https://corsproxy.io/?${encodeURIComponent(secureUrl)}`);
-                if (res.ok) return await res.json();
-            } catch (e) {
-                console.error("CorsProxy also failed.");
-            }
-
-            throw new Error("Failed to fetch via all proxies");
+            throw new Error("All proxies failed");
         }
 
         async function getDetail(url, cacheType) {
@@ -397,9 +397,12 @@
             if (cache[cacheType][url]) return cache[cacheType][url];
             try {
                 const data = await fetchWithProxy(url);
-                cache[cacheType][url] = data;
-                return data;
+                if (data) {
+                    cache[cacheType][url] = data;
+                    return data;
+                }
             } catch (e) { return null; }
+            return null;
         }
 
         async function fetchEspnDraft() {
@@ -408,24 +411,28 @@
             const syncTimeText = document.getElementById('lastSyncTime');
 
             try {
-                // Correct Core API URL (forced HTTPS for security)
+                // Core API Picks Endpoint
                 const picksUrl = 'https://sports.core.api.espn.com/v2/sports/football/leagues/nfl/seasons/2026/draft/picks?limit=257';
                 const picksData = await fetchWithProxy(picksUrl);
                 
                 if (picksData && picksData.items) {
-                    const sortedPicks = picksData.items.sort((a, b) => b.number - a.number);
-                    // Filter for picks that actually have an athlete (are completed)
-                    const rawHistory = sortedPicks.filter(p => p.athlete).slice(0, 10);
+                    // Filter completed picks and sort newest first
+                    const completedPicks = picksData.items
+                        .filter(p => p.athlete)
+                        .sort((a, b) => b.number - a.number)
+                        .slice(0, 10);
 
-                    const resolvedHistory = await Promise.all(rawHistory.map(async p => {
+                    // Resolve details for each pick
+                    const resolvedHistory = await Promise.all(completedPicks.map(async p => {
                         const athlete = await getDetail(p.athlete.$ref, 'athletes');
                         const team = await getDetail(p.team.$ref, 'teams');
+                        
                         return {
                             number: p.number,
                             player: athlete ? athlete.displayName : "Unknown",
-                            pos: athlete && athlete.position ? athlete.position.abbreviation : "",
-                            school: athlete && athlete.collegeAthlete ? athlete.collegeAthlete.school.name : (athlete && athlete.college ? athlete.college.name : ""),
-                            logo: team && team.logos ? team.logos[0].href : null
+                            pos: (athlete && athlete.position) ? athlete.position.abbreviation : "",
+                            school: (athlete && athlete.collegeAthlete && athlete.collegeAthlete.school) ? athlete.collegeAthlete.school.name : "",
+                            logo: (team && team.logos) ? team.logos[0].href : null
                         };
                     }));
 
@@ -439,16 +446,17 @@
                         }
                     }
 
-                    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    syncTimeText.innerText = `Sync: ${now}`;
+                    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    syncTimeText.innerText = `Last Sync: ${now}`;
                     statusText.innerText = "ESPN API: LIVE";
                     apiIndicator.className = 'api-status active';
                     updateUI();
                 }
             } catch (e) {
-                console.error("Fetch Error", e);
-                statusText.innerText = "ESPN API: ERR/OFFLINE";
+                console.error("Critical Fetch Error", e);
+                statusText.innerText = "ESPN API: OFFLINE";
                 apiIndicator.className = 'api-status error';
+                syncTimeText.innerText = "Check your connection";
             }
         }
 
@@ -461,7 +469,8 @@
             }, { merge: true });
         }
 
-        setInterval(fetchEspnDraft, 30000); // 30s interval to prevent proxy rate limiting
+        // Initialize and Set Polling
+        setInterval(fetchEspnDraft, 45000); // 45s interval to ensure we don't spam proxies
         fetchEspnDraft();
 
         async function resetTo204() {
@@ -487,7 +496,7 @@
                     }
                     updateUI();
                 }
-            });
+            }, err => console.error("Firebase Snapshot Error", err));
         }
 
         updateUI();
